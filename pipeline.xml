@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<Pipelines xmlns ="uri:pipelineSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="uri:pipelineSchema pipeline.xsd">
+        <Pipeline pipelineName="testPipeline 1 ">
+                <Feed>
+                    <DBURL>localhost:3306</DBURL>
+                    <DBName>acad</DBName>
+                    <DBUserName>root</DBUserName>
+                    <DBPassword>root</DBPassword>
+                </Feed>
+                <Stages>
+                        <stage number="1">
+                            <stageName>Reading Input</stageName>
+                            <stageDesciption>Reading inputs of data from paths specified</stageDesciption>
+                            <input>
+                                    select * from students where student_id = 1 
+                            </input>
+                            <processing>
+                                    
+                            </processing>
+                            
+                        </stage>
+                        <stage number ="2">
+                            <stageName>Processing Step 1 </stageName>
+                            <stageDesciption>Applying various process on the read data</stageDesciption>
+                        </stage>
+                </Stages>
+                <Views>
+                    <view>
+                        <viewName> Display result 1</viewName>
+                        <viewDescription>what results will this view will show.</viewDescription>
+                    </view>
+                </Views>
+        </Pipeline>
+</Pipelines>
