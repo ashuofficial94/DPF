@@ -1,13 +1,40 @@
 package com.DFP.dao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import org.springframework.stereotype.Repository;
 
+import java.sql.*;
+import java.util.ArrayList;
+
+@Repository
 public class DataBase {
 
-     public String getUser(String DBURL,String DBName,String DBUser, String DBPass,String query){
+    public ArrayList <ArrayList<String> > executeQuery(String DBURL, String DBName, String DBUser,String DBPass,String query){
+        ArrayList <ArrayList<String> > result = new ArrayList<ArrayList<String>>();
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con= DriverManager.getConnection(
+                    "jdbc:mysql://"+DBURL+"/"+DBName,DBUser,DBPass);
+
+            Statement stmt=con.createStatement();
+            ResultSet rs=stmt.executeQuery(query);
+
+            ResultSetMetaData metadata = rs.getMetaData();
+            int columnCount = metadata.getColumnCount();
+
+            while(rs.next()){
+                ArrayList<String> row = new ArrayList<String>();
+                for (int i = 1; i <= columnCount; i++) {
+                    row.add(rs.getString(i));
+                }
+                result.add(row);
+            }
+
+            return result;
+        }catch (Exception e){System.out.println(e);}
+
+        return null;
+    }
+    public String getUser(String DBURL,String DBName,String DBUser, String DBPass,String query){
          try{
              Class.forName("com.mysql.cj.jdbc.Driver");
              Connection con= DriverManager.getConnection(
@@ -22,4 +49,22 @@ public class DataBase {
 
          return null;
      }
+//    public void displayResult(ResultSet rs)  {
+//        try{
+//            ResultSetMetaData metadata = rs.getMetaData();
+//            int columnCount = metadata.getColumnCount();
+//
+//            while(rs.next()){
+//                String row = "";
+//                for (int i = 1; i <= columnCount; i++) {
+//                    row += rs.getString(i) + ", ";
+//                }
+//                System.out.println(row);
+//            }
+//
+//        }  catch (SQLException e){
+//            System.out.println(e);
+//        }
+//
+//    }
 }
