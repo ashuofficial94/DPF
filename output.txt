@@ -195,3 +195,43 @@ Stage Number 2
 StageName :SALARY SUM
 Output :[[1281612]]
 Timestamp :2021-03-19 15:49:54.373
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-03-22 13:20:44.208
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-03-22 13:20:44.24
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-03-22 13:21:28.095
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-03-22 13:21:28.117
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-03-22 13:21:33.83
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-03-22 13:21:33.848
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-03-22 13:35:45.297
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-03-22 13:35:45.32

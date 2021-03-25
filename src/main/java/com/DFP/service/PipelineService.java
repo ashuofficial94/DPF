@@ -1,5 +1,7 @@
 package com.DFP.service;
 
+import com.DFP.bean.Feed;
+import com.DFP.controller.PipelineController;
 import com.DFP.dao.DataBase;
 import com.DFP.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.sql.SQLOutput;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -28,6 +31,8 @@ public class PipelineService {
 
     @Autowired
     private DataBase db;
+    @Autowired
+    private ConditionalProcessing conditionalProcessing;
 
     public Message parseXML(String xml){
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -42,62 +47,32 @@ public class PipelineService {
             Document doc = builder.parse(new InputSource(new StringReader(xml)));
 
             doc.getDocumentElement().normalize();
-            //Find the pipeline Name
-            NodeList pipelineList = doc.getElementsByTagName("Pipeline");
-            Element pipelineElement = (Element) pipelineList.item(0);
-            String pipelineName = pipelineElement.getAttribute("pipelineName");
-            System.out.println("Pipeline Name : "+pipelineName);
+
+//            Element docEl = doc.getDocumentElement();
+//            System.out.println(docEl.getTagName());
+//
+//            Node childNode = docEl.getFirstChild();
+//            while( childNode.getNextSibling()!=null ){
+//                childNode = childNode.getNextSibling();
+//                if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+//                    Element childElement = (Element) childNode;
+//                    System.out.println("NODE num:-" + childElement.getAttribute("num") + "<br/>\n" );
+//                }
+//            }
+            Element pipelines = doc.getDocumentElement();
 
 
-            NodeList feedList = doc.getElementsByTagName("Feed");
-            Element feedData = (Element) feedList.item(0);
+            Message message = null;
+            Node pipeline = pipelines.getFirstChild();
+            while( pipeline.getNextSibling()!=null ){
+                pipeline = pipeline.getNextSibling();
+                if (pipeline.getNodeType() == Node.ELEMENT_NODE) {
+                    Element pipelineElement = (Element) pipeline;
+                    message = parsePipeline(pipelineElement);
 
-            // Reading database information
-            String dburl = feedData.getElementsByTagName("DBURL").item(0).getTextContent();
-            String dbName = feedData.getElementsByTagName("DBName").item(0).getTextContent();
-            String dbUserName = feedData.getElementsByTagName("DBUserName").item(0).getTextContent();
-            String dbPassword = feedData.getElementsByTagName("DBPassword").item(0).getTextContent();
-
-
-            NodeList stageList = doc.getElementsByTagName("stage");
-            Element stageData = (Element) stageList.item(0);
-
-            NodeList nList = doc.getElementsByTagName("stage");
-            int stageCount = nList.getLength();
-            System.out.println("Number of stages :"+stageCount);
-            for (int temp = 0; temp < nList.getLength(); temp++) {
-                Node nNode = nList.item(temp);
-                System.out.println("\nCurrent Element :" + nNode.getNodeName());
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
-                    String stageNumber = eElement.getAttribute("number");
-                    String stageName = eElement.getElementsByTagName("stageName").item(0).getTextContent();
-                    String stageDesc = eElement.getElementsByTagName("stageDesciption").item(0).getTextContent();
-                    String query = eElement.getElementsByTagName("processing").item(0).getTextContent();
-                    String output = eElement.getElementsByTagName("output").item(0).getTextContent();
-
-                    System.out.println("Stage number : " + stageNumber);
-                    System.out.println("Stage Name  : "+ stageName);
-                    System.out.println("Stage desc  : "+stageDesc);
-                    System.out.println("Stage Query  : "+ query);
-
-                    ArrayList <ArrayList<String>> result = db.executeQuery(dburl, dbName,dbUserName,dbPassword,query);
-                    System.out.println("STAGE OUTPUT");
-                    if(result == null){
-                        return new Message("error", "Stage Number "+stageNumber+" Stage Name:"+eElement.getElementsByTagName("stageName"));
-                    }else if (result.size() ==0 ){
-                        return new Message("error", "Stage Number "+stageNumber+" Stage Name: "+stageName+" ->Query did not return any result");
-                    }
-                    if(output.equals("Display")){
-                        displayResult(result);
-                    } else if (output.equals("File")){
-                        System.out.println("Printing to File");
-                        writetoFile(result,pipelineName,stageNumber,stageName);
-                    }
-                    displayResult(result);
                 }
             }
-
+            if(message != null){ return message;}
 
         }
         catch (Exception e)
@@ -106,6 +81,97 @@ public class PipelineService {
             return new Message("error",e.getMessage());
         }
         return new Message("success","Pipeline Executed Successfully");
+    }
+    public Message parsePipeline(Element pipelineElement){
+        Node childNode = pipelineElement.getFirstChild();
+        Feed feed = null;
+        while(childNode.getNextSibling()!=null){
+            childNode =  childNode.getNextSibling();
+            if(childNode.getNodeType() == Node.ELEMENT_NODE){
+                Element childElement = (Element) childNode;
+                System.out.println("feed "+childElement.getTagName());
+                if(childElement.getTagName().equals("Feed")){
+                    feed = parseFeedElement(childElement);
+                }else{
+                    return executePipeline(feed,childElement);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public Message executePipeline(Feed feed, Element stages){
+        Node stageNode = stages.getFirstChild();
+        while(stageNode.getNextSibling()!=null){
+            stageNode = stageNode.getNextSibling();
+            if(stageNode.getNodeType() == Node.ELEMENT_NODE){
+                Element stageElement = (Element) stageNode;
+                System.out.println("Stage Name "+stageElement.getTagName()+" "+stageElement.getAttribute("number"));
+
+                    String stageNumber = stageElement.getAttribute("number");
+                    String stageName = stageElement.getElementsByTagName("stageName").item(0).getTextContent();
+                    String stageDesc = stageElement.getElementsByTagName("stageDesciption").item(0).getTextContent();
+
+                if(stageElement.getElementsByTagName("branch").item(0) != null){
+                    Message msg =  parseBranch(feed,stageElement);
+                    if(msg != null) return msg;
+
+                } else {
+                    String query = stageElement.getElementsByTagName("sqlProcessing").item(0).getTextContent();
+                    String output = stageElement.getElementsByTagName("output").item(0).getTextContent();
+
+                    ArrayList <ArrayList<String>> result = db.executeQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),query);
+                    System.out.println("STAGE OUTPUT");
+                    if(result == null){
+                        return new Message("error", "Stage Number "+stageNumber+" Stage Name:"+stageElement.getElementsByTagName("stageName"));
+                    }else if (result.size() ==0 ){
+                        return new Message("error", "Stage Number "+stageNumber+" Stage Name: "+stageName+" ->Query did not return any result");
+                    }
+                    if(stageElement.getElementsByTagName("conditionProcessing").item(0) != null){
+                        String conditionType = stageElement.getElementsByTagName("conditionProcessing").item(0).getTextContent();
+                        getConditionalResult(result.get(0).get(0),conditionType);
+                    }
+
+                    if(output.equals("Display")){
+                        displayResult(result);
+                    } else if (output.equals("File")){
+                        System.out.println("Printing to File");
+//                        writetoFile(result,pipelineName,stageNumber,stageName);
+                    }
+                    displayResult(result);
+                }
+
+            }
+        }
+        return null;
+    }
+    public Message parseBranch(Feed feed,Element stage){
+            Node childNode = stage.getFirstChild();
+            Element branch = null;
+            while(childNode.getNextSibling()!= null){
+                childNode = childNode.getNextSibling();
+                if(childNode.getNodeType() == Node.ELEMENT_NODE){
+                    Element childElement = (Element) childNode;
+                    if(childElement.getTagName().equals("branch")){
+                        branch = childElement;
+                        break;
+                    }
+                }
+            }
+            StageBranch brachThread = new StageBranch(feed,branch);
+            brachThread.start();
+
+        return null;
+    }
+    public Feed parseFeedElement(Element feedElement){
+        return new Feed(feedElement.getElementsByTagName("DBURL").item(0).getTextContent(),
+                feedElement.getElementsByTagName("DBName").item(0).getTextContent(),
+                feedElement.getElementsByTagName("DBUserName").item(0).getTextContent(),
+                feedElement.getElementsByTagName("DBPassword").item(0).getTextContent());
+    }
+    public void getConditionalResult(String value,String conditionType){
+        conditionalProcessing.handleConditionalRequest(value,conditionType);
     }
     public void displayResult(ArrayList <ArrayList<String>> rs)  {
         System.out.println(rs);
@@ -121,3 +187,69 @@ public class PipelineService {
         }
     }
 }
+
+
+
+//            //Find the pipeline Name
+//            NodeList pipelineList = doc.getElementsByTagName("Pipeline");
+//            Element pipelineElement = (Element) pipelineList.item(0);
+//            String pipelineName = pipelineElement.getAttribute("pipelineName");
+//            System.out.println("Pipeline Name : "+pipelineName);
+//
+//
+//            NodeList feedList = doc.getElementsByTagName("Feed");
+//            Element feedData = (Element) feedList.item(0);
+//
+//            // Reading database information
+//            String dburl = feedData.getElementsByTagName("DBURL").item(0).getTextContent();
+//            String dbName = feedData.getElementsByTagName("DBName").item(0).getTextContent();
+//            String dbUserName = feedData.getElementsByTagName("DBUserName").item(0).getTextContent();
+//            String dbPassword = feedData.getElementsByTagName("DBPassword").item(0).getTextContent();
+//
+//
+//            NodeList stageList = doc.getElementsByTagName("stage");
+//            Element stageData = (Element) stageList.item(0);
+//
+//            NodeList nList = doc.getElementsByTagName("stage");
+//            int stageCount = nList.getLength();
+//            System.out.println("Number of stages :"+stageCount);
+//            for (int temp = 0; temp < nList.getLength(); temp++) {
+//                Node nNode = nList.item(temp);
+//                System.out.println("\nCurrent Element :" + nNode.getNodeName());
+//                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+//                    Element eElement = (Element) nNode;
+//                    String stageName = eElement.getElementsByTagName("stageName").item(0).getTextContent();
+//                    System.out.println(stageName);
+////                    String stageNumber = eElement.getAttribute("number");
+////                    String stageName = eElement.getElementsByTagName("stageName").item(0).getTextContent();
+////                    String stageDesc = eElement.getElementsByTagName("stageDesciption").item(0).getTextContent();
+////                    String query = eElement.getElementsByTagName("sqlProcessing").item(0).getTextContent();
+////                    String output = eElement.getElementsByTagName("output").item(0).getTextContent();
+////
+////                    System.out.println("Stage number : " + stageNumber);
+////                    System.out.println("Stage Name  : "+ stageName);
+////                    System.out.println("Stage desc  : "+stageDesc);
+////                    System.out.println("Stage Query  : "+ query);
+////
+////
+////                    ArrayList <ArrayList<String>> result = db.executeQuery(dburl, dbName,dbUserName,dbPassword,query);
+////                    System.out.println("STAGE OUTPUT");
+////                    if(result == null){
+////                        return new Message("error", "Stage Number "+stageNumber+" Stage Name:"+eElement.getElementsByTagName("stageName"));
+////                    }else if (result.size() ==0 ){
+////                        return new Message("error", "Stage Number "+stageNumber+" Stage Name: "+stageName+" ->Query did not return any result");
+////                    }
+////                    if(eElement.getElementsByTagName("conditionProcessing").item(0) != null){
+////                        String conditionType = eElement.getElementsByTagName("conditionProcessing").item(0).getTextContent();
+////                        getConditionalResult(result.get(0).get(0),conditionType);
+////                    }
+////
+////                    if(output.equals("Display")){
+////                        displayResult(result);
+////                    } else if (output.equals("File")){
+////                        System.out.println("Printing to File");
+//////                        writetoFile(result,pipelineName,stageNumber,stageName);
+////                    }
+////                    displayResult(result);
+//                }
+//            }

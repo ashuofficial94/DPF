@@ -11,17 +11,38 @@
             <stage number="1">
                 <stageName>CHECK USER</stageName>
                 <stageDesciption>Checking if the user exists in database</stageDesciption>
-                <processing> select * from employees where emp_no = 10001</processing>
+                <sqlProcessing> select * from employees where emp_no = 10001</sqlProcessing>
                 <output>File</output>
             </stage>
             <stage number="2">
                 <stageName>SALARY SUM</stageName>
                 <stageDesciption>Finding the sum of the salary of the employee over the years</stageDesciption>
-                <processing>SELECT SUM(salary) FROM employees as e join salaries as s on e.emp_no = s.emp_no where e.emp_no=10001;</processing>
+                <sqlProcessing>SELECT SUM(salary) FROM employees as e join salaries as s on e.emp_no = s.emp_no where e.emp_no=10001;</sqlProcessing>
+                <output>File</output>
+            </stage>
+            <stage number="3">
+                <stageName>Manager Branch</stageName>
+                <stageDesciption>Testing Brach</stageDesciption>
+                <branch>
+                    <stage number="123">
+                        <stageName>Branch Stage 1</stageName>
+                    </stage>
+                    <stage number="123">
+                        <stageName>Branch Stage 2</stageName>
+                    </stage>
+                </branch>
+            </stage>
+
+            <stage number="4">
+                <stageName>Department BONUS</stageName>
+                <stageDesciption>Defining the Bonus based on department</stageDesciption>
+                <sqlProcessing>SELECT d.dept_no FROM departments as d, employees as e , dept_emp as de where e.emp_no = de.emp_no and d.dept_no = de.dept_no and e.emp_no = 10001;</sqlProcessing>
+                <conditionProcessing>DEPT_BONUS</conditionProcessing>
                 <output>File</output>
             </stage>
 
         </Stages>
 
     </Pipeline>
+
 </Pipelines>
