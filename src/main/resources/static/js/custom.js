@@ -7,6 +7,7 @@ window.onload = function(){
 create_pipeline_form.addEventListener('submit', async (e) => {
     document.getElementById("pipeline-Success").style.display = "none";
     document.getElementById("pipeline-Error").style.display = "none";
+    $("body").addClass("loading");
     if (create_pipeline_form.checkValidity() === true) {
         let response = await fetch('/getXML', {
             method: 'POST',
@@ -19,7 +20,7 @@ create_pipeline_form.addEventListener('submit', async (e) => {
         let result = await response.json();
         // let result = await response;
         console.log(result["status"]);
-
+        $("body").removeClass("loading");
         if(result['status'] == "success"){
             document.getElementById("pipeline-Success").style.display = "block";
             document.getElementById("pipeline-Success-msg").innerText = result['msg'];

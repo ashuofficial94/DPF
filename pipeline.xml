@@ -24,12 +24,20 @@
                 <stageName>Manager Branch</stageName>
                 <stageDesciption>Testing Brach</stageDesciption>
                 <branch>
-                    <stage number="123">
-                        <stageName>Branch Stage 1</stageName>
+                    <stages>
+                    <stage number="1">
+                        <stageName>Get Department Managers</stageName>
+                        <stageDesciption>Get the current department managers of each department</stageDesciption>
+                        <sqlProcessing>SELECT * FROM employees as e ,dept_manager as m, departments as d where e.emp_no = m.emp_no and m.dept_no = d.dept_no and to_date = '9999-01-01';</sqlProcessing>
+                        <output>File</output>
                     </stage>
-                    <stage number="123">
-                        <stageName>Branch Stage 2</stageName>
+                    <stage number="2">
+                        <stageName>Get Employee Current title</stageName>
+                        <stageDesciption>Get the current title of the given employee</stageDesciption>
+                        <sqlProcessing>SELECT t.title FROM employees as e, titles as t where e.emp_no = t.emp_no and e.emp_no = 10001;</sqlProcessing>
+                        <output>File</output>
                     </stage>
+                    </stages>
                 </branch>
             </stage>
 

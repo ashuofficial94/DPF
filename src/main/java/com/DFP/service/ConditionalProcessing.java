@@ -8,7 +8,6 @@ public class ConditionalProcessing {
         switch (dept_no) {
             case "d001":
                 System.out.println("Calculate Bonus - Marketing");
-
                 break;
             case "d002":
                 System.out.println("Calculate Bonus - Finance");

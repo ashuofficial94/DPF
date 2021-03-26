@@ -235,3 +235,28 @@ Stage Number 2
 StageName :SALARY SUM
 Output :[[1281612]]
 Timestamp :2021-03-22 13:35:45.32
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-03-26 13:16:20.835
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-03-26 13:16:20.858
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-03-26 13:16:20.877
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :Get Department Managers
+Output :[[110039, 1963-06-21, Vishwani, Minakawa, M, 1986-04-12, 110039, d001, 1991-10-01, 9999-01-01, d001, Marketing], [110114, 1957-03-28, Isamu, Legleitner, F, 1985-01-14, 110114, d002, 1989-12-17, 9999-01-01, d002, Finance], [110228, 1958-12-02, Karsten, Sigstam, F, 1985-08-04, 110228, d003, 1992-03-21, 9999-01-01, d003, Human Resources], [110420, 1963-07-27, Oscar, Ghazalie, M, 1992-02-05, 110420, d004, 1996-08-30, 9999-01-01, d004, Production], [110567, 1964-04-25, Leon, DasSarma, F, 1986-10-21, 110567, d005, 1992-04-25, 9999-01-01, d005, Development], [110854, 1960-08-19, Dung, Pesch, M, 1989-06-09, 110854, d006, 1994-06-28, 9999-01-01, d006, Quality Management], [111133, 1955-03-16, Hauke, Zhang, M, 1986-12-30, 111133, d007, 1991-03-07, 9999-01-01, d007, Sales], [111534, 1952-06-27, Hilary, Kambil, F, 1988-01-31, 111534, d008, 1991-04-08, 9999-01-01, d008, Research], [111939, 1960-03-25, Yuchang, Weedman, M, 1989-07-10, 111939, d009, 1996-01-03, 9999-01-01, d009, Customer Service]]
+Timestamp :2021-03-26 13:16:22.897
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :Get Employee Current title
+Output :[[Senior Engineer]]
+Timestamp :2021-03-26 13:16:22.902

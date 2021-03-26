@@ -33,6 +33,9 @@ public class PipelineService {
     private DataBase db;
     @Autowired
     private ConditionalProcessing conditionalProcessing;
+    private String pipelineName;
+
+    private ArrayList<Thread> branchList = new ArrayList<Thread>();
 
     public Message parseXML(String xml){
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -48,17 +51,6 @@ public class PipelineService {
 
             doc.getDocumentElement().normalize();
 
-//            Element docEl = doc.getDocumentElement();
-//            System.out.println(docEl.getTagName());
-//
-//            Node childNode = docEl.getFirstChild();
-//            while( childNode.getNextSibling()!=null ){
-//                childNode = childNode.getNextSibling();
-//                if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-//                    Element childElement = (Element) childNode;
-//                    System.out.println("NODE num:-" + childElement.getAttribute("num") + "<br/>\n" );
-//                }
-//            }
             Element pipelines = doc.getDocumentElement();
 
 
@@ -84,6 +76,7 @@ public class PipelineService {
     }
     public Message parsePipeline(Element pipelineElement){
         Node childNode = pipelineElement.getFirstChild();
+        this.pipelineName = pipelineElement.getAttribute("pipelineName");
         Feed feed = null;
         while(childNode.getNextSibling()!=null){
             childNode =  childNode.getNextSibling();
@@ -116,8 +109,10 @@ public class PipelineService {
                 if(stageElement.getElementsByTagName("branch").item(0) != null){
                     Message msg =  parseBranch(feed,stageElement);
                     if(msg != null) return msg;
+                    Thread t = Thread.currentThread();
 
                 } else {
+
                     String query = stageElement.getElementsByTagName("sqlProcessing").item(0).getTextContent();
                     String output = stageElement.getElementsByTagName("output").item(0).getTextContent();
 
@@ -136,12 +131,19 @@ public class PipelineService {
                     if(output.equals("Display")){
                         displayResult(result);
                     } else if (output.equals("File")){
-                        System.out.println("Printing to File");
-//                        writetoFile(result,pipelineName,stageNumber,stageName);
+                          System.out.println("Printing to File");
+                          writetoFile(result,stageNumber,stageName);
                     }
                     displayResult(result);
                 }
 
+            }
+
+        }
+        for(int i =0 ; i<branchList.size();i++){
+            Thread t = branchList.get(i);
+            while(t.isAlive()) {
+//                    System.out.println("Branch running");
             }
         }
         return null;
@@ -159,8 +161,16 @@ public class PipelineService {
                     }
                 }
             }
-            StageBranch brachThread = new StageBranch(feed,branch);
-            brachThread.start();
+            StageBranch branchThread = new StageBranch(feed,branch,this.pipelineName);
+            branchList.add(branchThread);
+            branchThread.start();
+
+//        try {
+//            branchThread.join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//            return new Message("error",e.getMessage());
+//        }
 
         return null;
     }
@@ -176,10 +186,10 @@ public class PipelineService {
     public void displayResult(ArrayList <ArrayList<String>> rs)  {
         System.out.println(rs);
     }
-    public void writetoFile(ArrayList <ArrayList<String>> rs,String pipeline,String stageNumber,String stageName){
+    public void writetoFile(ArrayList <ArrayList<String>> rs,String stageNumber,String stageName){
         Path path = Paths.get("", "output.txt");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String text = "\nPipeline Name "+pipeline +" \nStage Number "+stageNumber +"\nStageName :"+stageName+ "\nOutput :"+rs+"\nTimestamp :"+timestamp;
+        String text = "\nPipeline Name "+this.pipelineName +" \nStage Number "+stageNumber +"\nStageName :"+stageName+ "\nOutput :"+rs+"\nTimestamp :"+timestamp;
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.APPEND,StandardOpenOption.CREATE)) {
             writer.write(text);
         } catch (IOException e) {
