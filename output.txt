@@ -260,3 +260,48 @@ Stage Number 2
 StageName :Get Employee Current title
 Output :[[Senior Engineer]]
 Timestamp :2021-03-26 13:16:22.902
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-04-01 21:06:11.449
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-04-01 21:06:11.484
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-01 21:06:11.513
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-04-01 21:10:05.879
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-04-01 21:10:05.903
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-01 21:10:05.928
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-04-01 21:14:07.763
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-04-01 21:14:07.784
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-01 21:14:07.812
