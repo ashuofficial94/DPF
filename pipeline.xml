@@ -22,19 +22,6 @@
             </stage>
 
 
-            <stage number="4">
-                <stageName>Department BONUS</stageName>
-                <stageDesciption>Defining the Bonus based on department</stageDesciption>
-                <conditionProcessing>select * from employees where emp_no = 10001</conditionProcessing>
-                <action>
-                    <value>skip</value>
-                    <time>1000</time>
-                </action>
-                <sqlProcessing>SELECT d.dept_no FROM departments as d, employees as e , dept_emp as de where e.emp_no = de.emp_no and d.dept_no = de.dept_no and e.emp_no = 10001;</sqlProcessing>
-
-                <output>File</output>
-            </stage>
-
             <stage number="3">
                 <stageName>Manager Branch</stageName>
                 <stageDesciption>Testing Brach</stageDesciption>
@@ -52,6 +39,31 @@
                         <output>File</output>
                     </stage>
                 </parallelStages>
+            </stage>
+            <stage number="4">
+                <stageName>Department BONUS</stageName>
+                <stageDesciption>Defining the Bonus based on department</stageDesciption>
+                <conditionProcessing>select * from employees where emp_no = 10001</conditionProcessing>
+                <action>
+                    <value>skip</value>
+                    <time>1000</time>
+                </action>
+                <sqlProcessing>SELECT d.dept_no FROM departments as d, employees as e , dept_emp as de where e.emp_no = de.emp_no and d.dept_no = de.dept_no and e.emp_no = 10001;</sqlProcessing>
+                <sqlProcessing>SELECT d.dept_no FROM departments as d, employees as e , dept_emp as de where e.emp_no = de.emp_no and d.dept_no = de.dept_no and e.emp_no = 10001;</sqlProcessing>
+                <output>File</output>
+            </stage>
+            <stage number = "5">
+                <stageName>Java processing </stageName>
+                <stageDesciption>Running another java program</stageDesciption>
+                <javaProcessing>Test.java</javaProcessing>
+                <output>File</output>
+            </stage>
+            <stage number = "6">
+                <stageName>SQL update insert</stageName>
+                <stageDesciption>Running insert of update query in database</stageDesciption>
+                <sqlProcessing>INSERT INTO departments VALUES ('d010', 'Testing');
+                </sqlProcessing>
+                <output>File</output>
             </stage>
 
         </Stages>

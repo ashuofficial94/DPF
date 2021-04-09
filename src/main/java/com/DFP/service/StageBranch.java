@@ -75,7 +75,7 @@ public class StageBranch extends Thread{
                         String query = stageElement.getElementsByTagName("sqlProcessing").item(0).getTextContent();
                         String output = stageElement.getElementsByTagName("output").item(0).getTextContent();
                         try{
-                            ArrayList <ArrayList<String>> result = db.executeQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),query);
+                            ArrayList <ArrayList<String>> result = db.executeSelectQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),query);
                             System.out.println("STAGE OUTPUT");
                             if(result == null){
                                 return new Message("error", "Stage Number "+stageNumber+" Stage Name:"+stageElement.getElementsByTagName("stageName"));

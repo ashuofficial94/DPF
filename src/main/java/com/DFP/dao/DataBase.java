@@ -7,8 +7,34 @@ import java.util.ArrayList;
 
 @Repository
 public class DataBase {
+    public int executeDMLQuery(String DBURL, String DBName, String DBUser,String DBPass,String query){
+        int rowsEffected=0;
+        Statement stmt =null;
+        Connection con = null;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con= DriverManager.getConnection(
+                    "jdbc:mysql://"+DBURL+"/"+DBName,DBUser,DBPass);
+            stmt=con.createStatement();
+            rowsEffected = stmt.executeUpdate(query);
 
-    public ArrayList <ArrayList<String> > executeQuery(String DBURL, String DBName, String DBUser,String DBPass,String query){
+
+        }catch (Exception e){System.out.println(e);}finally {
+            try{
+                if(stmt!=null)
+                    stmt.close();
+            }catch(SQLException se2){
+            }// nothing we can do
+            try{
+                if(con!=null)
+                    con.close();
+            }catch(SQLException se){
+                se.printStackTrace();
+            }//end finally try
+        }
+        return rowsEffected;
+    }
+    public ArrayList <ArrayList<String> > executeSelectQuery(String DBURL, String DBName, String DBUser,String DBPass,String query){
         ArrayList <ArrayList<String> > result = new ArrayList<ArrayList<String>>();
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");

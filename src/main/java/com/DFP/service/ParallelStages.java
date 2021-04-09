@@ -45,7 +45,7 @@ public class ParallelStages extends Thread{
                 String query = this.stage.getElementsByTagName("sqlProcessing").item(0).getTextContent();
                 String output = this.stage.getElementsByTagName("output").item(0).getTextContent();
 
-                ArrayList <ArrayList<String>> result = db.executeQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),query);
+                ArrayList <ArrayList<String>> result = db.executeSelectQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),query);
                 System.out.println("STAGE OUTPUT");
                 if(result == null){
                     return new Message("error", "Stage Number "+stageNumber+" Stage Name:"+this.stage.getElementsByTagName("stageName"));

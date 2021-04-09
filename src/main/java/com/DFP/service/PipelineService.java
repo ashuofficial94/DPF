@@ -14,9 +14,8 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -114,7 +113,7 @@ public class PipelineService {
 
                 } else {
 
-                    String query = stageElement.getElementsByTagName("sqlProcessing").item(0).getTextContent();
+
                     String output = stageElement.getElementsByTagName("output").item(0).getTextContent();
                     boolean conditionStatus = false;
                     boolean stageSkip = false;
@@ -122,7 +121,7 @@ public class PipelineService {
                         while(true){
 
                                 String conditionalQuery = stageElement.getElementsByTagName("conditionProcessing").item(0).getTextContent();
-                                ArrayList <ArrayList<String>> conditionQueryResult = db.executeQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),conditionalQuery);
+                                ArrayList <ArrayList<String>> conditionQueryResult = db.executeSelectQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),conditionalQuery);
                                 String conditionalAction = stageElement.getElementsByTagName("value").item(0).getTextContent();
                                 if(conditionQueryResult.size()>0){
                                     conditionStatus = true;
@@ -151,22 +150,59 @@ public class PipelineService {
                     if(stageSkip == true) continue;
 
                     if(conditionStatus == true || stageElement.getElementsByTagName("conditionProcessing").item(0) == null){
-                        ArrayList <ArrayList<String>> result = db.executeQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),query);
-                        System.out.println("STAGE OUTPUT");
-                        if(result == null){
-                            return new Message("error", "Stage Number "+stageNumber+" Stage Name:"+stageElement.getElementsByTagName("stageName"));
-                        }else if (result.size() ==0 ){
-                            return new Message("error", "Stage Number "+stageNumber+" Stage Name: "+stageName+" ->Query did not return any result");
-                        }
+                        if (stageElement.getElementsByTagName("sqlProcessing").item(0) != null){
+                            NodeList nList = stageElement.getElementsByTagName("sqlProcessing");
+                            int stageCount = nList.getLength();
+                            for (int temp = 0; temp < nList.getLength(); temp++) {
+                                Node nNode = nList.item(temp);
+
+                                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                                    Element eElement = (Element) nNode;
+
+                                    String query = eElement.getTextContent();
+                                    if(query.contains("INSERT") || query.contains("insert") || query.contains("UPDATE") || query.contains("update")){
+
+                                        int rowsEffected = db.executeDMLQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),query);
+                                        System.out.println("Number of rows effected "+rowsEffected);
+                                    } else {
+                                        ArrayList <ArrayList<String>> result = db.executeSelectQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),query);
+                                        System.out.println("STAGE OUTPUT");
+                                        if(result == null){
+                                            return new Message("error", "Stage Number "+stageNumber+" Stage Name:"+stageElement.getElementsByTagName("stageName"));
+                                        }else if (result.size() ==0 ){
+                                            return new Message("error", "Stage Number "+stageNumber+" Stage Name: "+stageName+" ->Query did not return any result");
+                                        }
+
+                                        if(output.equals("Display")){
+                                            displayResult(result);
+                                        } else if (output.equals("File")){
+                                            System.out.println("Printing to File");
+                                            //                          writetoFile(result,stageNumber,stageName);
+                                        }
+                                        displayResult(result);
+                                    }
+
+                                }
+                            }
 
 
-                        if(output.equals("Display")){
-                            displayResult(result);
-                        } else if (output.equals("File")){
-                            System.out.println("Printing to File");
-//                          writetoFile(result,stageNumber,stageName);
+                         }
+
+                        if (stageElement.getElementsByTagName("javaProcessing").item(0) != null){
+                            String javaFileName = stageElement.getElementsByTagName("javaProcessing").item(0).getTextContent();
+
+                            String path = "src/main/java/com/DFP/utils/"+javaFileName;
+
+                            String javaFileSepeartor =".";
+                            String className = javaFileName.substring(0,javaFileName.lastIndexOf(javaFileSepeartor));
+                            String classPath = "com/DFP/utils/"+className;
+                            System.out.println(path);
+                            System.out.println(classPath);
+
+                            runProcess("javac -cp src "+path);
+                            runProcess("java -cp src/main/java "+classPath);
                         }
-                        displayResult(result);
+
                     }
                 }
 
@@ -180,6 +216,27 @@ public class PipelineService {
 //            }
 //        }
         return null;
+    }
+    public void runProcess(String command) {
+        Process pro = null;
+        try {
+            pro = Runtime.getRuntime().exec(command);
+            printLines(command + " stdout:", pro.getInputStream());
+            printLines(command + " stderr:", pro.getErrorStream());
+            pro.waitFor();
+            System.out.println(command + " exitValue() " + pro.exitValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    public  void printLines(String cmd, InputStream ins) throws Exception {
+        String line = null;
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(ins));
+        while ((line = in.readLine()) != null) {
+            System.out.println(cmd + " " + line);
+        }
     }
     public Message parseParrallelStages(Feed feed,Element stage){
         Node childNode = stage.getFirstChild();
