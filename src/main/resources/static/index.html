@@ -2,47 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Get Started</title>
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="./css/style.css" defer>
 </head>
 <body>
 <div class="container">
-    <h3 class="title-form">Create Pipeline</h3>
-
     <div class="row">
+        <div class="col-md-3">
+            <nav class="navbar bg-light">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <button class="nav-link btn btn-success btn-lg" id="execute-button">Execute Pipeline</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link btn btn-success btn-lg btn-block" id="create-button">Create Pipeline</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="col-md-9">
+            <div class="panel">
+                <div id="execute-panel">
+                    <h3>Operations Available</h3>
+                </div>
+                <div id="create-panel" style="display: none">
+                    <h3>Create Pipeline</h3>
+                    <form action="#" class="login-form text-center needs-validation-courses" id="createPipelineForm" >
 
-        <div class="main-right col-md-8 col-sm-8">
-            <div class="createPipeline" id="createPipeline">
-                <form action="#" class="login-form text-center needs-validation-courses" id="createPipelineForm" >
+                        <div class="form-group">
+                            <label for="pipelineXML">Enter Pipeline ( XML ) </label>
+                            <textarea class="form-control" rows="20" id="pipelineXML" required type="text" value="" ></textarea>
+                        </div>
 
+                        <div class="form-submit">
+                            <input type="submit"  class="btn btn-primary" value="EXECUTE PIPELINE">
+                        </div>
 
-                    <div class="form-group">
-                        <label for="pipelineXML">Enter Pipeline ( XML ) </label>
-                        <textarea class="form-control" rows="30" id="pipelineXML" required type="text" value="" ></textarea>
-                    </div>
-
-                    <div class="form-submit">
-                        <input type="submit"  class="btn btn-primary" value="EXECUTE PIPELINE">
-                    </div>
-
-                </form>
-
+                    </form>
+                </div>
             </div>
         </div>
-        <div class="col-md-4 col-sm-4">
-            <div class="alert alert-success" role="alert" id="pipeline-Success">
-                <span class="box-text" id="pipeline-Success-msg"></span>
-            </div>
-            <div class="alert alert-danger" role="alert" id ="pipeline-Error">
-                <span class="box-text" id="pipeline-Error-msg"></span>
-
-            </div>
-        </div>
-
-
     </div>
+<!--    <h3 class="title-form">Create Pipeline</h3>-->
+
+<!--    <div class="row">-->
+
+<!--        <div class="main-right col-md-8 col-sm-8">-->
+<!--            <div class="createPipeline" id="createPipeline">-->
+
+
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="col-md-4 col-sm-4">-->
+<!--            <div class="alert alert-success" role="alert" id="pipeline-Success">-->
+<!--                <span class="box-text" id="pipeline-Success-msg"></span>-->
+<!--            </div>-->
+<!--            <div class="alert alert-danger" role="alert" id ="pipeline-Error">-->
+<!--                <span class="box-text" id="pipeline-Error-msg"></span>-->
+
+<!--            </div>-->
+<!--        </div>-->
+
+
+<!--    </div>-->
+
+
 </div>
 
 

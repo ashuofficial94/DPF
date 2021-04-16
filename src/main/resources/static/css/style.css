@@ -15,3 +15,26 @@ body.loading{
 body.loading .overlay{
     display: block;
 }
+
+.navbar {
+    margin: 5px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+body {
+    background-color: #6c757d;
+}
+
+.nav-link.btn {
+    margin: 5px;
+    padding: 10px;
+    width: 200px;
+}
+
+.panel {
+    background-color: white;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 10px;
+}
