@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
-<Pipelines xmlns ="uri:pipelineSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="uri:pipelineSchema pipeline.xsd">
-    <Pipeline pipelineName="EmployeePipeline">
+<?xml version='1.0'?>
+<Pipelines xmlns ='uri:pipelineSchema' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='uri:pipelineSchema pipeline.xsd'>
+    <Pipeline pipelineName='EmployeePipeline'>
         <Feed>
             <DBURL>localhost:3306</DBURL>
             <DBName>employees</DBName>
@@ -8,13 +8,13 @@
             <DBPassword>root</DBPassword>
         </Feed>
         <Stages>
-            <stage number="1">
+            <stage number='1'>
                 <stageName>CHECK USER</stageName>
                 <stageDesciption>Checking if the user exists in database</stageDesciption>
                 <sqlProcessing> select * from employees where emp_no = 10001</sqlProcessing>
                 <output>File</output>
             </stage>
-            <stage number="2">
+            <stage number='2'>
                 <stageName>SALARY SUM</stageName>
                 <stageDesciption>Finding the sum of the salary of the employee over the years</stageDesciption>
                 <sqlProcessing>SELECT SUM(salary) FROM employees as e join salaries as s on e.emp_no = s.emp_no where e.emp_no=10001;</sqlProcessing>
@@ -22,17 +22,17 @@
             </stage>
 
 
-            <stage number="3">
+            <stage number='3'>
                 <stageName>Manager Branch</stageName>
                 <stageDesciption>Testing Brach</stageDesciption>
                 <parallelStages>
-                    <stage number="3.1">
+                    <stage number='3.1'>
                         <stageName>Get Department Managers</stageName>
                         <stageDesciption>Get the current department managers of each department</stageDesciption>
                         <sqlProcessing>SELECT * FROM employees as e ,dept_manager as m, departments as d where e.emp_no = m.emp_no and m.dept_no = d.dept_no and to_date = '9999-01-01';</sqlProcessing>
                         <output>File</output>
                     </stage>
-                    <stage number="3.2">
+                    <stage number='3.2'>
                         <stageName>Get Employee Current title</stageName>
                         <stageDesciption>Get the current title of the given employee</stageDesciption>
                         <sqlProcessing>SELECT t.title FROM employees as e, titles as t where e.emp_no = t.emp_no and e.emp_no = 10001;</sqlProcessing>
@@ -40,7 +40,7 @@
                     </stage>
                 </parallelStages>
             </stage>
-            <stage number="4">
+            <stage number='4'>
                 <stageName>Department BONUS</stageName>
                 <stageDesciption>Defining the Bonus based on department</stageDesciption>
                 <conditionProcessing>select * from employees where emp_no = 10001</conditionProcessing>
@@ -52,17 +52,16 @@
                 <sqlProcessing>SELECT d.dept_no FROM departments as d, employees as e , dept_emp as de where e.emp_no = de.emp_no and d.dept_no = de.dept_no and e.emp_no = 10001;</sqlProcessing>
                 <output>File</output>
             </stage>
-            <stage number = "5">
+            <stage number = '5'>
                 <stageName>Java processing </stageName>
                 <stageDesciption>Running another java program</stageDesciption>
                 <javaProcessing>Test.java</javaProcessing>
                 <output>File</output>
             </stage>
-            <stage number = "6">
+            <stage number = '6'>
                 <stageName>SQL update insert</stageName>
                 <stageDesciption>Running insert of update query in database</stageDesciption>
-                <sqlProcessing>INSERT INTO departments VALUES ('d010', 'Testing');
-                </sqlProcessing>
+                <sqlProcessing>INSERT INTO departments VALUES ('d010', 'Testing');</sqlProcessing>
                 <output>File</output>
             </stage>
 

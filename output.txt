@@ -305,3 +305,83 @@ Stage Number 4
 StageName :Department BONUS
 Output :[[d005]]
 Timestamp :2021-04-01 21:14:07.812
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-04-09 13:47:34.891
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-04-09 13:47:34.912
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-09 13:47:34.977
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-09 13:47:34.995
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-04-09 13:47:43.056
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-04-09 13:47:43.073
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-09 13:47:43.128
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-09 13:47:43.144
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-04-17 13:07:17.382
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-04-17 13:07:17.411
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-17 13:07:17.486
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-17 13:07:17.505
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-04-17 13:07:34.636
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-04-17 13:07:34.657
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-17 13:07:34.715
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-17 13:07:34.734
