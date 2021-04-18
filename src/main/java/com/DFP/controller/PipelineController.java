@@ -1,15 +1,14 @@
 package com.DFP.controller;
 
 import com.DFP.bean.Pipeline;
-import com.DFP.payload.request.PipelineRequest;
 import com.DFP.payload.request.PiplineID;
 import com.DFP.service.ExecutePipelineService;
 import com.DFP.service.PipelineService;
 import com.DFP.utils.Message;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.channels.Pipe;
 import java.util.List;
 
 
@@ -37,20 +36,21 @@ public class PipelineController {
 
     }
     @PostMapping("/savePipeline")
-    public Message addPipeline(@RequestBody PipelineRequest pipelineRequest){
-                Pipeline pipeLine = new Pipeline(pipelineRequest.getName(),pipelineRequest.getPipeline());
-                try{
-                    Pipeline result = pipelineService.addCourse(pipeLine);
-                    if(result == null){
-                        return new Message("error","Unable to add pipeline");
-                    } else {
-                        return new Message("success","Pipeline created successfully");
-                    }
-                } catch (Exception e){
-                    return new Message("error",e.getMessage());
-                }
+    public Message addPipeline(@RequestBody JSONObject pipelineJSON){
 
+        Pipeline pipeLine = new Pipeline(pipelineJSON.get("name").toString(),
+                pipelineJSON.get("pipeline").toString());
 
+        try{
+            Pipeline result = pipelineService.addCourse(pipeLine);
+            if(result == null){
+                return new Message("error","Unable to add pipeline");
+            } else {
+                return new Message("success","Pipeline created successfully");
+            }
+        } catch (Exception e){
+            return new Message("error",e.getMessage());
+        }
     }
     @GetMapping("/getpipelines")
     public List<Pipeline> getCourses(){

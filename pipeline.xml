@@ -5,7 +5,7 @@
             <DBURL>localhost:3306</DBURL>
             <DBName>employees</DBName>
             <DBUserName>root</DBUserName>
-            <DBPassword>root</DBPassword>
+            <DBPassword>password</DBPassword>
         </Feed>
         <Stages>
             <stage number='1'>
@@ -24,7 +24,7 @@
 
             <stage number='3'>
                 <stageName>Manager Branch</stageName>
-                <stageDesciption>Testing Brach</stageDesciption>
+                <stageDesciption>Testing Branch</stageDesciption>
                 <parallelStages>
                     <stage number='3.1'>
                         <stageName>Get Department Managers</stageName>

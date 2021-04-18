@@ -385,3 +385,23 @@ Stage Number 4
 StageName :Department BONUS
 Output :[[d005]]
 Timestamp :2021-04-17 13:07:34.734
+Pipeline Name EmployeePipeline 
+Stage Number 1
+StageName :CHECK USER
+Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
+Timestamp :2021-04-19 04:13:04.376
+Pipeline Name EmployeePipeline 
+Stage Number 2
+StageName :SALARY SUM
+Output :[[1281612]]
+Timestamp :2021-04-19 04:13:04.416
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-19 04:13:04.57
+Pipeline Name EmployeePipeline 
+Stage Number 4
+StageName :Department BONUS
+Output :[[d005]]
+Timestamp :2021-04-19 04:13:04.594
