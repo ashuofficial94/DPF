@@ -1,3 +1,6 @@
+var stompClient = null;
+
+
 let create_pipeline_form = document.getElementById('createPipelineForm');
 
 let execute_link = document.querySelector('#execute-button');
@@ -177,4 +180,24 @@ create_pipeline_form.addEventListener('submit', async (e) => {
 
 window.onload = () => {
     execute_link.click();
+}
+function connect() {
+    var socket = new SockJS('/gs-guide-websocket');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('/result/stage', function (stageResultMessage) {
+            showStageResult(JSON.parse(stageResultMessage.body).content);
+        });
+    });
+}
+function disconnect() {
+    if (stompClient !== null) {
+        stompClient.disconnect();
+    }
+    console.log("Disconnected");
+}
+function showStageResult(stageResultMessage) {
+    console.log(stageResultMessage);
 }

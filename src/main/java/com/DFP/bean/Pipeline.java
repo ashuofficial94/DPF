@@ -12,6 +12,7 @@ public class Pipeline {
 
     @NotBlank
     @Size(max = 50)
+    @Column(length=255)
     private String name;
 
     @NotBlank

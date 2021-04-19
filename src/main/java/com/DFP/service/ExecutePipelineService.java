@@ -2,8 +2,10 @@ package com.DFP.service;
 
 import com.DFP.bean.Feed;
 import com.DFP.dao.DataBase;
+import com.DFP.payload.response.StageResultResponse;
 import com.DFP.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -25,6 +27,12 @@ import java.util.ArrayList;
 
 @Service
 public class ExecutePipelineService {
+
+    private static SimpMessageSendingOperations messagingTemplate;
+    @Autowired
+    public ExecutePipelineService(SimpMessageSendingOperations messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @Autowired
     private DataBase db;
@@ -199,6 +207,7 @@ public class ExecutePipelineService {
                         }
 
                     }
+                    ExecutePipelineService.messagingTemplate.convertAndSend("/result/stage", new StageResultResponse(stageNumber,stageName,"success"));
                 }
 
             }
@@ -273,6 +282,9 @@ public class ExecutePipelineService {
 //                    System.out.println("Branch running");
             }
         }
+        String stageNumber = stage.getAttribute("number");
+        String stageName = stage.getElementsByTagName("stageName").item(0).getTextContent();
+        ExecutePipelineService.messagingTemplate.convertAndSend("/result/stage", new StageResultResponse(stageNumber,stageName,"success"));
         return null;
 
     }

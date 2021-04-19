@@ -5,7 +5,7 @@
             <DBURL>localhost:3306</DBURL>
             <DBName>employees</DBName>
             <DBUserName>root</DBUserName>
-            <DBPassword>password</DBPassword>
+            <DBPassword>root</DBPassword>
         </Feed>
         <Stages>
             <stage number='1'>

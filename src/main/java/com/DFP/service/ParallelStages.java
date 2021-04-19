@@ -2,8 +2,10 @@ package com.DFP.service;
 
 import com.DFP.bean.Feed;
 import com.DFP.dao.DataBase;
+import com.DFP.payload.response.StageResultResponse;
 import com.DFP.utils.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -18,6 +20,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class ParallelStages extends Thread{
+
+//    private static SimpMessageSendingOperations messagingTemplate;
+//
+//    @Autowired
+//    public ParallelStages(SimpMessageSendingOperations messagingTemplate) {
+//        this.messagingTemplate = messagingTemplate;
+//    }
 
     private DataBase db = new DataBase();
     @Autowired
@@ -59,6 +68,7 @@ public class ParallelStages extends Thread{
         //                          writetoFile(result,stageNumber,stageName);
                 }
                 displayResult(result);
+//                ParallelStages.messagingTemplate.convertAndSend("/result/stage", new StageResultResponse(stageNumber,stageName,"success"));
                 return null;
     }
     public void displayResult(ArrayList <ArrayList<String>> rs)  {
