@@ -25,7 +25,7 @@ public class PipelineService {
         return pipelineRepository.findAll();
     }
 
-    public Pipeline getPipeline(long pipelineId) {
+    public Pipeline getPipeline(Long pipelineId) {
         return pipelineRepository.getOne(pipelineId);
     }
 }

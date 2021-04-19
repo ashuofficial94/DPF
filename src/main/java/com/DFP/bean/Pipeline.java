@@ -6,8 +6,11 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "piplelines")
 public class Pipeline {
-
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank
     @Size(max = 50)
     private String name;
 
@@ -21,6 +24,14 @@ public class Pipeline {
     public Pipeline(String name, String pipelinexml) {
         this.name = name;
         this.pipelinexml = pipelinexml;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
