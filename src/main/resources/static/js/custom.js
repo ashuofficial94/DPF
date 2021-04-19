@@ -63,16 +63,35 @@ execute_link.addEventListener('click', async (e) => {
         col1.innerText = pipeline_list[id][0];
 
         let col2 = document.createElement("td");
-        let button = document.createElement("button");
-        button.classList.add("btn");
-        button.classList.add("btn-primary");
-        button.innerText = "Execute";
-        button.style.width = "100px";
+        let execute_button = document.createElement("button");
+        execute_button.classList.add("btn");
+        execute_button.classList.add("btn-primary");
+        execute_button.innerText = "Execute";
+        execute_button.style.width = "100px";
+        execute_button.style.margin = "5px";
+        execute_button.style.padding = "5px";
 
-        button.addEventListener('click', async(e) => {
+        let show_button = document.createElement("button");
+        show_button.classList.add("btn", "btn-warning", "bi", "bi-eye");
+        show_button.innerHTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-eye\" viewBox=\"0 0 16 16\">\n" +
+            "  <path d=\"M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z\"/>\n" +
+            "  <path d=\"M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z\"/>\n" +
+            "</svg>";
 
-            button.disabled = true;
-            button.innerText = "Executing";
+        show_button.style.margin = "5px";
+        show_button.style.padding = "5px";
+        show_button.setAttribute("data-toggle", "modal");
+        show_button.setAttribute("data-target", "#myModal");
+
+        show_button.addEventListener('click', e => {
+            document.getElementById("modal-heading").innerText = pipeline_list[id][0];
+            document.getElementById("modal-content").innerText = pipeline_list[id][1];
+        });
+
+        execute_button.addEventListener('click', async(e) => {
+
+            execute_button.disabled = true;
+            execute_button.innerText = "Executing";
 
             let execution_request = {
                 pipeline_id: id,
@@ -92,10 +111,12 @@ execute_link.addEventListener('click', async (e) => {
             notification(result, pipeline_list[id][0]);
         });
 
-        col2.appendChild(button);
+        col2.appendChild(execute_button);
+        col2.appendChild(show_button);
 
         row.appendChild(col1);
         row.appendChild(col2);
+
         pipeline_table.appendChild(row);
     }
 });

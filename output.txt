@@ -3,39 +3,39 @@ Pipeline Name EmployeePipeline
 Stage Number 1
 StageName :CHECK USER
 Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
-Timestamp :2021-04-19 11:51:42.15
+Timestamp :2021-04-19 12:31:12.43
 Pipeline Name EmployeePipeline 
 Stage Number 2
 StageName :SALARY SUM
 Output :[[1281612]]
-Timestamp :2021-04-19 11:51:42.188
+Timestamp :2021-04-19 12:31:12.454
 Pipeline Name EmployeePipeline 
 Stage Number 4
 StageName :Department BONUS
 Output :[[d005]]
-Timestamp :2021-04-19 11:51:42.348
+Timestamp :2021-04-19 12:31:12.537
 Pipeline Name EmployeePipeline 
 Stage Number 4
 StageName :Department BONUS
 Output :[[d005]]
-Timestamp :2021-04-19 11:51:42.396
+Timestamp :2021-04-19 12:31:12.558
 Pipeline Name EmployeePipeline 
 Stage Number 1
 StageName :CHECK USER
 Output :[[10001, 1953-09-02, Georgi, Facello, M, 1986-06-26]]
-Timestamp :2021-04-19 11:51:51.165
+Timestamp :2021-04-19 13:15:02.499
 Pipeline Name EmployeePipeline 
 Stage Number 2
 StageName :SALARY SUM
 Output :[[1281612]]
-Timestamp :2021-04-19 11:51:51.21
+Timestamp :2021-04-19 13:15:02.729
 Pipeline Name EmployeePipeline 
 Stage Number 4
 StageName :Department BONUS
 Output :[[d005]]
-Timestamp :2021-04-19 11:51:51.485
+Timestamp :2021-04-19 13:15:02.796
 Pipeline Name EmployeePipeline 
 Stage Number 4
 StageName :Department BONUS
 Output :[[d005]]
-Timestamp :2021-04-19 11:51:51.52
+Timestamp :2021-04-19 13:15:02.845
