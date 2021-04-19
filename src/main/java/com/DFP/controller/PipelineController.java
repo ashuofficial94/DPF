@@ -9,6 +9,8 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,12 +33,12 @@ public class PipelineController {
 //    }
 
     @PostMapping("/getXML")
-    public Message getXML(@RequestBody String xml){
-        Message message = executePipelineService.parseXML(xml);
+    public Message getXML(@RequestBody String xml, Integer validate){
+        Message message = executePipelineService.parseXML(xml, validate);
 //        System.out.println(xml);
         return message;
-
     }
+
     @PostMapping("/savePipeline")
     public Message addPipeline(@RequestBody JSONObject pipelineJSON){
 
@@ -57,28 +59,29 @@ public class PipelineController {
     @GetMapping("/getpipelines")
     public JSONObject getCourses(){
         List<Pipeline> pipeline_list = pipelineService.getAllPipelines();
-        Map<Long, String> map = new HashMap<>();
+        Map<Long, List<String>> map = new HashMap<>();
 
         for(Pipeline pipeline: pipeline_list) {
-            map.put(pipeline.getId(), pipeline.getName());
+
+            List<String> pipeline_info = new ArrayList<>();
+            pipeline_info.add(pipeline.getName());
+            pipeline_info.add(pipeline.getPipelinexml());
+
+            map.put(pipeline.getId(), pipeline_info);
         }
 
         JSONObject pipeline_json =  new JSONObject(map);
-        System.out.println(pipeline_json);
-
         return pipeline_json;
     }
 
     @PostMapping("/executePipeline")
-    public Message executeSpecificPipeline(@RequestBody long pipelineID){
-            try{
-                Pipeline pipeline = pipelineService.getPipeline(pipelineID);
-                Message message = executePipelineService.parseXML(pipeline.getPipelinexml());
-
-                return message;
-
-            }catch(Exception e){
-                    return new Message("error",e.getMessage());
-            }
+    public Message executeSpecificPipeline(@RequestBody JSONObject execution_request){
+        try{
+            Message message = executePipelineService.parseXML(
+                        execution_request.get("pipeline").toString(), (int)execution_request.get("validate"));
+            return message;
+        } catch(Exception e){
+                return new Message("error",e.getMessage());
+        }
     }
 }

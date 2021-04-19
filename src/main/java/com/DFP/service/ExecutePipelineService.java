@@ -35,12 +35,11 @@ public class ExecutePipelineService {
     private ArrayList<Thread> branchList = new ArrayList<Thread>();
     private ArrayList<Thread> parallelStagesList = new ArrayList<Thread>();
 
-    public Message parseXML(String xml){
+    public Message parseXML(String xml, Integer validate) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
         DocumentBuilder builder = null;
-        try
-        {
+        try {
             //Create DocumentBuilder with default configuration
             builder = factory.newDocumentBuilder();
 
@@ -54,37 +53,38 @@ public class ExecutePipelineService {
 
             Message message = null;
             Node pipeline = pipelines.getFirstChild();
-            while( pipeline.getNextSibling()!=null ){
+            while (pipeline.getNextSibling() != null) {
                 pipeline = pipeline.getNextSibling();
                 if (pipeline.getNodeType() == Node.ELEMENT_NODE) {
                     Element pipelineElement = (Element) pipeline;
-                    message = parsePipeline(pipelineElement);
+                    message = parsePipeline(pipelineElement, validate);
 
                 }
             }
-            if(message != null){ return message;}
+            if (message != null) {
+                return message;
+            }
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
-            return new Message("error",e.getMessage());
+            return new Message("error", e.getMessage());
         }
-        return new Message("success","Pipeline Executed Successfully");
+        return new Message("success", "Pipeline Executed Successfully");
     }
-    public Message parsePipeline(Element pipelineElement){
+
+    public Message parsePipeline(Element pipelineElement, Integer validate) {
         Node childNode = pipelineElement.getFirstChild();
         this.pipelineName = pipelineElement.getAttribute("pipelineName");
         Feed feed = null;
-        while(childNode.getNextSibling()!=null){
-            childNode =  childNode.getNextSibling();
-            if(childNode.getNodeType() == Node.ELEMENT_NODE){
+        while (childNode.getNextSibling() != null) {
+            childNode = childNode.getNextSibling();
+            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element childElement = (Element) childNode;
-                System.out.println("feed "+childElement.getTagName());
-                if(childElement.getTagName().equals("Feed")){
+                System.out.println("feed " + childElement.getTagName());
+                if (childElement.getTagName().equals("Feed")) {
                     feed = parseFeedElement(childElement);
-                }else{
-                    return executePipeline(feed,childElement);
+                } else {
+                    return executePipeline(feed, childElement, validate);
                 }
             }
         }
@@ -92,21 +92,21 @@ public class ExecutePipelineService {
         return null;
     }
 
-    public Message executePipeline(Feed feed, Element stages){
+    public Message executePipeline(Feed feed, Element stages, Integer validate) {
         Node stageNode = stages.getFirstChild();
-        while(stageNode.getNextSibling()!=null){
+        while (stageNode.getNextSibling() != null) {
             stageNode = stageNode.getNextSibling();
-            if(stageNode.getNodeType() == Node.ELEMENT_NODE){
+            if (stageNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element stageElement = (Element) stageNode;
-                System.out.println("Stage Name "+stageElement.getTagName()+" "+stageElement.getAttribute("number"));
+                System.out.println("Stage Name " + stageElement.getTagName() + " " + stageElement.getAttribute("number"));
 
-                    String stageNumber = stageElement.getAttribute("number");
-                    String stageName = stageElement.getElementsByTagName("stageName").item(0).getTextContent();
-                    String stageDesc = stageElement.getElementsByTagName("stageDesciption").item(0).getTextContent();
+                String stageNumber = stageElement.getAttribute("number");
+                String stageName = stageElement.getElementsByTagName("stageName").item(0).getTextContent();
+                String stageDesc = stageElement.getElementsByTagName("stageDesciption").item(0).getTextContent();
 
-                if(stageElement.getElementsByTagName("parallelStages").item(0) != null){
-                    Message msg =  parseParrallelStages(feed,stageElement);
-                    if(msg != null) return msg;
+                if (stageElement.getElementsByTagName("parallelStages").item(0) != null) {
+                    Message msg = parseParrallelStages(feed, stageElement);
+                    if (msg != null) return msg;
                     Thread t = Thread.currentThread();
 
                 } else {
@@ -115,40 +115,40 @@ public class ExecutePipelineService {
                     String output = stageElement.getElementsByTagName("output").item(0).getTextContent();
                     boolean conditionStatus = false;
                     boolean stageSkip = false;
-                    if(stageElement.getElementsByTagName("conditionProcessing").item(0) != null){
-                        while(true){
+                    if (stageElement.getElementsByTagName("conditionProcessing").item(0) != null) {
+                        while (true) {
 
-                                String conditionalQuery = stageElement.getElementsByTagName("conditionProcessing").item(0).getTextContent();
-                                ArrayList <ArrayList<String>> conditionQueryResult = db.executeSelectQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),conditionalQuery);
-                                String conditionalAction = stageElement.getElementsByTagName("value").item(0).getTextContent();
-                                if(conditionQueryResult.size()>0){
-                                    conditionStatus = true;
-                                    break;
-                                }  else {
-                                    if(conditionalAction.equals("wait")){
-                                        String time = stageElement.getElementsByTagName("time").item(0).getTextContent();
-                                        Thread t = Thread.currentThread();
-                                        try {
-                                            System.out.println("going to sleep");
-                                            t.sleep(Long.parseLong(time));
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                    } else if(conditionalAction.equals("halt")){
-                                        return new Message("error", "Stage Number "+stageNumber+" Stage Name:"+stageName+" Conditional Query Failed");
-                                    } else if(conditionalAction.equals("skip")){
-                                        stageSkip = true;
-                                        break;
+                            String conditionalQuery = stageElement.getElementsByTagName("conditionProcessing").item(0).getTextContent();
+                            ArrayList<ArrayList<String>> conditionQueryResult = db.executeSelectQuery(feed.getDburl(), feed.getDbName(), feed.getDbUserName(), feed.getDbPassword(), conditionalQuery);
+                            String conditionalAction = stageElement.getElementsByTagName("value").item(0).getTextContent();
+                            if (conditionQueryResult.size() > 0) {
+                                conditionStatus = true;
+                                break;
+                            } else {
+                                if (conditionalAction.equals("wait")) {
+                                    String time = stageElement.getElementsByTagName("time").item(0).getTextContent();
+                                    Thread t = Thread.currentThread();
+                                    try {
+                                        System.out.println("going to sleep");
+                                        t.sleep(Long.parseLong(time));
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
                                     }
-
+                                } else if (conditionalAction.equals("halt")) {
+                                    return new Message("error", "Stage Number " + stageNumber + " Stage Name:" + stageName + " Conditional Query Failed");
+                                } else if (conditionalAction.equals("skip")) {
+                                    stageSkip = true;
+                                    break;
                                 }
+
+                            }
 
                         }
                     }
-                    if(stageSkip == true) continue;
+                    if (stageSkip == true) continue;
 
-                    if(conditionStatus == true || stageElement.getElementsByTagName("conditionProcessing").item(0) == null){
-                        if (stageElement.getElementsByTagName("sqlProcessing").item(0) != null){
+                    if (conditionStatus == true || stageElement.getElementsByTagName("conditionProcessing").item(0) == null) {
+                        if (stageElement.getElementsByTagName("sqlProcessing").item(0) != null) {
                             NodeList nList = stageElement.getElementsByTagName("sqlProcessing");
                             int stageCount = nList.getLength();
                             for (int temp = 0; temp < nList.getLength(); temp++) {
@@ -158,47 +158,44 @@ public class ExecutePipelineService {
                                     Element eElement = (Element) nNode;
 
                                     String query = eElement.getTextContent();
-                                    if(query.contains("INSERT") || query.contains("insert") || query.contains("UPDATE") || query.contains("update")){
+                                    if (query.contains("INSERT") || query.contains("insert") || query.contains("UPDATE") || query.contains("update")) {
 
-                                        int rowsEffected = db.executeDMLQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),query);
-                                        System.out.println("Number of rows effected "+rowsEffected);
+                                        int rowsEffected = db.executeDMLQuery(feed.getDburl(), feed.getDbName(), feed.getDbUserName(), feed.getDbPassword(), query);
+                                        System.out.println("Number of rows effected " + rowsEffected);
                                     } else {
-                                        ArrayList <ArrayList<String>> result = db.executeSelectQuery(feed.getDburl(), feed.getDbName(),feed.getDbUserName(),feed.getDbPassword(),query);
+                                        ArrayList<ArrayList<String>> result = db.executeSelectQuery(feed.getDburl(), feed.getDbName(), feed.getDbUserName(), feed.getDbPassword(), query);
                                         System.out.println("STAGE OUTPUT");
-                                        if(result == null){
-                                            return new Message("error", "Stage Number "+stageNumber+" Stage Name:"+stageElement.getElementsByTagName("stageName"));
-                                        }else if (result.size() ==0 ){
-                                            return new Message("error", "Stage Number "+stageNumber+" Stage Name: "+stageName+" ->Query did not return any result");
+                                        if (result == null) {
+                                            return new Message("error", "Stage Number " + stageNumber + " Stage Name:" + stageElement.getElementsByTagName("stageName"));
+                                        } else if (result.size() == 0) {
+                                            return new Message("error", "Stage Number " + stageNumber + " Stage Name: " + stageName + " ->Query did not return any result");
                                         }
 
-                                        if(output.equals("Display")){
+                                        if (output.equals("Display")) {
                                             displayResult(result);
-                                        } else if (output.equals("File")){
+                                        } else if (output.equals("File") && validate != 1) {
                                             System.out.println("Printing to File");
-                                                                      writetoFile(result,stageNumber,stageName);
+                                            writetoFile(result, stageNumber, stageName);
                                         }
                                         displayResult(result);
                                     }
-
                                 }
                             }
+                        }
 
-
-                         }
-
-                        if (stageElement.getElementsByTagName("javaProcessing").item(0) != null){
+                        if (stageElement.getElementsByTagName("javaProcessing").item(0) != null) {
                             String javaFileName = stageElement.getElementsByTagName("javaProcessing").item(0).getTextContent();
 
-                            String path = "src/main/java/com/DFP/utils/"+javaFileName;
+                            String path = "src/main/java/com/DFP/utils/" + javaFileName;
 
-                            String javaFileSepeartor =".";
-                            String className = javaFileName.substring(0,javaFileName.lastIndexOf(javaFileSepeartor));
-                            String classPath = "com/DFP/utils/"+className;
+                            String javaFileSepeartor = ".";
+                            String className = javaFileName.substring(0, javaFileName.lastIndexOf(javaFileSepeartor));
+                            String classPath = "com/DFP/utils/" + className;
                             System.out.println(path);
                             System.out.println(classPath);
 
-                            runProcess("javac -cp src "+path);
-                            runProcess("java -cp src/main/java "+classPath);
+                            runProcess("javac -cp src " + path);
+                            runProcess("java -cp src/main/java " + classPath);
                         }
 
                     }
@@ -215,6 +212,7 @@ public class ExecutePipelineService {
 //        }
         return null;
     }
+
     public void runProcess(String command) {
         Process pro = null;
         try {
@@ -228,7 +226,8 @@ public class ExecutePipelineService {
         }
 
     }
-    public  void printLines(String cmd, InputStream ins) throws Exception {
+
+    public void printLines(String cmd, InputStream ins) throws Exception {
         String line = null;
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(ins));
@@ -236,25 +235,26 @@ public class ExecutePipelineService {
             System.out.println(cmd + " " + line);
         }
     }
-    public Message parseParrallelStages(Feed feed,Element stage){
+
+    public Message parseParrallelStages(Feed feed, Element stage) {
         Node childNode = stage.getFirstChild();
         Element parallelStage = null;
-        while(childNode.getNextSibling()!= null){
+        while (childNode.getNextSibling() != null) {
             childNode = childNode.getNextSibling();
-            if(childNode.getNodeType() == Node.ELEMENT_NODE){
+            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element childElement = (Element) childNode;
-                if(childElement.getTagName().equals("parallelStages")){
+                if (childElement.getTagName().equals("parallelStages")) {
                     parallelStage = childElement;
                     break;
                 }
             }
         }
         Node stages = parallelStage.getFirstChild();
-        while(stages.getNextSibling() != null){
+        while (stages.getNextSibling() != null) {
             stages = stages.getNextSibling();
-            if(stages.getNodeType() == Node.ELEMENT_NODE){
+            if (stages.getNodeType() == Node.ELEMENT_NODE) {
                 Element stageElement = (Element) stages;
-                ParallelStages stageThread = new ParallelStages(feed,stageElement,this.pipelineName);
+                ParallelStages stageThread = new ParallelStages(feed, stageElement, this.pipelineName);
                 parallelStagesList.add(stageThread);
                 stageThread.start();
 
@@ -267,9 +267,9 @@ public class ExecutePipelineService {
 //                }
             }
         }
-        for(int i =0 ; i<parallelStagesList.size();i++){
+        for (int i = 0; i < parallelStagesList.size(); i++) {
             Thread t = parallelStagesList.get(i);
-            while(t.isAlive()) {
+            while (t.isAlive()) {
 //                    System.out.println("Branch running");
             }
         }
@@ -277,7 +277,7 @@ public class ExecutePipelineService {
 
     }
 
-//    public Message parseBranch(Feed feed,Element stage){
+    //    public Message parseBranch(Feed feed,Element stage){
 //            Node childNode = stage.getFirstChild();
 //            Element branch = null;
 //            while(childNode.getNextSibling()!= null){
@@ -303,30 +303,32 @@ public class ExecutePipelineService {
 //
 //        return null;
 //    }
-    public Feed parseFeedElement(Element feedElement){
+    public Feed parseFeedElement(Element feedElement) {
         return new Feed(feedElement.getElementsByTagName("DBURL").item(0).getTextContent(),
                 feedElement.getElementsByTagName("DBName").item(0).getTextContent(),
                 feedElement.getElementsByTagName("DBUserName").item(0).getTextContent(),
                 feedElement.getElementsByTagName("DBPassword").item(0).getTextContent());
     }
-    public void getConditionalResult(String value,String conditionType){
-        conditionalProcessing.handleConditionalRequest(value,conditionType);
+
+    public void getConditionalResult(String value, String conditionType) {
+        conditionalProcessing.handleConditionalRequest(value, conditionType);
     }
-    public void displayResult(ArrayList <ArrayList<String>> rs)  {
+
+    public void displayResult(ArrayList<ArrayList<String>> rs) {
         System.out.println(rs);
     }
-    public void writetoFile(ArrayList <ArrayList<String>> rs,String stageNumber,String stageName){
+
+    public void writetoFile(ArrayList<ArrayList<String>> rs, String stageNumber, String stageName) {
         Path path = Paths.get("", "output.txt");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String text = "\nPipeline Name "+this.pipelineName +" \nStage Number "+stageNumber +"\nStageName :"+stageName+ "\nOutput :"+rs+"\nTimestamp :"+timestamp;
-        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.APPEND,StandardOpenOption.CREATE)) {
+        String text = "\nPipeline Name " + this.pipelineName + " \nStage Number " + stageNumber + "\nStageName :" + stageName + "\nOutput :" + rs + "\nTimestamp :" + timestamp;
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
             writer.write(text);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 }
-
 
 
 //            //Find the pipeline Name

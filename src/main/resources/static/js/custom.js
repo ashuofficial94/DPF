@@ -5,6 +5,25 @@ let create_link = document.querySelector('#create-button');
 let execute_panel = document.querySelector('#execute-panel');
 let create_panel = document.querySelector('#create-panel');
 
+let notification = (result, pipeline_name) => {
+    let notification_header = document.getElementById('notification-header');
+    let notification_body = document.getElementById('notification-body');
+    let notification_color = document.getElementById('notification-color');
+
+    notification_header.innerText = pipeline_name + ": " + result["status"];
+    notification_body.innerText = result["msg"];
+
+    if(result["status"] === "error") {
+        notification_color.setAttribute("fill", "red");
+        $('.toast').toast('show');
+        return;
+    }
+
+    notification_color.setAttribute("fill", "green");
+    execute_link.click();
+    $('.toast').toast('show');
+}
+
 execute_link.addEventListener('click', async (e) => {
     execute_panel.style.display = "block";
     create_panel.style.display = "none";
@@ -19,11 +38,6 @@ execute_link.addEventListener('click', async (e) => {
     let pipeline_list = await response.json();
     let pipeline_table = document.getElementById("pipeline-list");
     pipeline_table.innerHTML = '';
-
-    // <tr>
-    //     <td><strong>Pipeline</strong></td>
-    //     <td><strong>Operations</strong></td>
-    // </tr>
 
     let top_row = document.createElement("tr");
     let top_col1 = document.createElement("td");
@@ -46,40 +60,36 @@ execute_link.addEventListener('click', async (e) => {
         let row = document.createElement("tr");
 
         let col1 = document.createElement("td");
-        col1.innerText = pipeline_list[id];
+        col1.innerText = pipeline_list[id][0];
 
         let col2 = document.createElement("td");
         let button = document.createElement("button");
         button.classList.add("btn");
         button.classList.add("btn-primary");
         button.innerText = "Execute";
+        button.style.width = "100px";
 
         button.addEventListener('click', async(e) => {
+
+            button.disabled = true;
+            button.innerText = "Executing";
+
+            let execution_request = {
+                pipeline_id: id,
+                pipeline: pipeline_list[id][1],
+                validate: 0
+            }
 
             let response = await fetch('/executePipeline', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'
                 },
-                body: id
+                body: JSON.stringify(execution_request)
             })
 
             let result = await response.json();
-
-            let notification_header = document.getElementById('notification-header');
-            let notification_body = document.getElementById('notification-body');
-            let notification_color = document.getElementById('notification-color');
-
-            notification_header.innerText = pipeline_list[id] + ": " + result["status"];
-            notification_body.innerText = result["msg"];
-
-            if(result["status"] === "error")
-                notification_color.setAttribute("fill", "red");
-
-            else
-                notification_color.setAttribute("fill", "green");
-
-            $('.toast').toast('show');
+            notification(result, pipeline_list[id][0]);
         });
 
         col2.appendChild(button);
@@ -99,14 +109,7 @@ create_link.addEventListener('click', () => {
     document.getElementById('pipeline-name').value = "pipeline_"+d.getTime()+".xml";
 });
 
-window.onload = () => {
-    execute_link.click();
-}
-//
 create_pipeline_form.addEventListener('submit', async (e) => {
-    // document.getElementById("pipeline-Success").style.display = "none";
-    // document.getElementById("pipeline-Error").style.display = "none";
-    // $("body").addClass("loading");
     e.preventDefault();
     e.stopPropagation();
 
@@ -115,7 +118,30 @@ create_pipeline_form.addEventListener('submit', async (e) => {
         pipeline: document.getElementById('pipeline-xml').value
     }
 
+    let validation_request = {
+        pipeline_id: 0,
+        pipeline: pipeline_request.pipeline,
+        validate: 1
+    }
+
+    let response = await fetch('/executePipeline', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(validation_request)
+    });
+
+    let data = await response.json();
+    console.log(data);
+
+    if(data.status === "error") {
+        notification(data, pipeline_request.name);
+        return;
+    }
+
     if (create_pipeline_form.checkValidity() === true) {
+        document.getElementById('pipeline-xml').value = '';
         let response = await fetch('/savePipeline', {
             method: 'POST',
             headers: {
@@ -124,19 +150,10 @@ create_pipeline_form.addEventListener('submit', async (e) => {
             body: JSON.stringify(pipeline_request)
         });
         let result = await response.json();
-
-        let notification_header = document.getElementById('notification-header');
-        let notification_body = document.getElementById('notification-body');
-
-        notification_header.innerText = result["status"];
-        notification_body.innerText = result["msg"];
-
-        execute_link.click();
-        $('.toast').toast('show');
+        notification(result, pipeline_request.name);
     }
 });
-//
-// function hideAlerts(){
-//     document.getElementById("pipeline-Success").style.display = "none";
-//     document.getElementById("pipeline-Error").style.display = "none";
-// }
+
+window.onload = () => {
+    execute_link.click();
+}

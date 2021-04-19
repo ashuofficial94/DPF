@@ -9,6 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="./css/style.css">
     <script src="js/custom.js" defer></script>
 </head>
@@ -37,31 +38,30 @@
                 </div>
                 <div id="create-panel" style="display: none">
                     <h3>Create Pipeline</h3>
-                    <form action="#" class="login-form needs-validation-courses" id="createPipelineForm" >
+                    <form action="#" class="login-form needs-validation-courses" id="createPipelineForm">
                         <div class="form-group">
                             <label for="pipeline-name">Name</label>
                             <input id="pipeline-name" class="form-control" disabled />
                         </div>
                         <div class="form-group">
                             <label for="pipeline-xml">Enter Pipeline ( XML )</label>
-                            <textarea class="form-control" rows="20" id="pipeline-xml" required type="text"></textarea>
+                            <textarea class="form-control" rows="20" id="pipeline-xml" required type="text" aria-required="true"></textarea>
                         </div>
                         <div class="form-submit">
-                            <input type="submit"  class="btn btn-primary btn-large" value="Add Pipeline">
+                            <input type="submit"  class="btn btn-primary btn-large" id="submit-button" value="Add Pipeline">
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    <div role="alert" style="position: absolute; top: 10px; right: 10px" aria-live="assertive"
-         aria-atomic="true" class="toast fade" id="notification" data-delay="2000" data-autohide="true">
+    <div role="alert" style="position: fixed; top: 10px; right: 10px" aria-live="assertive"
+         aria-atomic="true" class="toast fade" id="notification" data-delay="3000" data-autohide="true">
         <div class="toast-header">
             <svg class="rounded mr-2" width="40" height="20" xmlns="http://www.w3.org/2000/svg"
                  preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
                 <rect fill="red" width="100%" height="100%" id="notification-color"/></svg>
             <strong class="mr-auto" id="notification-header"></strong>
-            <small>just now</small>
             <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
