@@ -27,10 +27,13 @@
                 </ul>
             </nav>
         </div>
-        <div class="col-md-9">
+        <div class="col">
             <div class="panel">
                 <div id="execute-panel">
-                    <h3>Operations Available</h3>
+                    <h3>Pipelines Available</h3>
+                    <table class="table table-hover" id="pipeline-list">
+
+                    </table>
                 </div>
                 <div id="create-panel" style="display: none">
                     <h3>Create Pipeline</h3>
@@ -50,6 +53,20 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div role="alert" style="position: absolute; top: 10px; right: 10px" aria-live="assertive"
+         aria-atomic="true" class="toast fade" id="notification" data-delay="2000" data-autohide="true">
+        <div class="toast-header">
+            <svg class="rounded mr-2" width="40" height="20" xmlns="http://www.w3.org/2000/svg"
+                 preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                <rect fill="red" width="100%" height="100%" id="notification-color"/></svg>
+            <strong class="mr-auto" id="notification-header"></strong>
+            <small>just now</small>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body" id="notification-body"></div>
     </div>
 </div>
 </body>

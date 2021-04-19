@@ -9,7 +9,9 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -53,16 +55,28 @@ public class PipelineController {
         }
     }
     @GetMapping("/getpipelines")
-    public List<Pipeline> getCourses(){
-        return pipelineService.getAllPipelines();
+    public JSONObject getCourses(){
+        List<Pipeline> pipeline_list = pipelineService.getAllPipelines();
+        Map<Long, String> map = new HashMap<>();
+
+        for(Pipeline pipeline: pipeline_list) {
+            map.put(pipeline.getId(), pipeline.getName());
+        }
+
+        JSONObject pipeline_json =  new JSONObject(map);
+        System.out.println(pipeline_json);
+
+        return pipeline_json;
     }
+
     @PostMapping("/executePipeline")
-    public Message executeSpecificPipeline(@RequestBody PiplineID piplineID){
+    public Message executeSpecificPipeline(@RequestBody long pipelineID){
             try{
-                Pipeline pipeline = pipelineService.getPipeline(piplineID.getId());
+                Pipeline pipeline = pipelineService.getPipeline(pipelineID);
                 Message message = executePipelineService.parseXML(pipeline.getPipelinexml());
 
                 return message;
+
             }catch(Exception e){
                     return new Message("error",e.getMessage());
             }
