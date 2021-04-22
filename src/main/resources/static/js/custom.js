@@ -1,5 +1,4 @@
-var stompClient = null;
-
+let stompClient = null;
 
 let create_pipeline_form = document.getElementById('createPipelineForm');
 
@@ -7,6 +6,9 @@ let execute_link = document.querySelector('#execute-button');
 let create_link = document.querySelector('#create-button');
 let execute_panel = document.querySelector('#execute-panel');
 let create_panel = document.querySelector('#create-panel');
+let displayed_row;
+
+let stageData = []
 
 let notification = (result, pipeline_name) => {
     let notification_header = document.getElementById('notification-header');
@@ -23,7 +25,6 @@ let notification = (result, pipeline_name) => {
     }
 
     notification_color.setAttribute("fill", "green");
-    execute_link.click();
     $('.toast').toast('show');
 }
 
@@ -93,8 +94,37 @@ execute_link.addEventListener('click', async (e) => {
 
         execute_button.addEventListener('click', async(e) => {
 
+            if(displayed_row) {
+                displayed_row.style.display = "none";
+                displayed_row.children[0].innerHTML = "";
+            }
+
             execute_button.disabled = true;
             execute_button.innerText = "Executing";
+
+            let execution_row = document.getElementById(pipeline_list[id][0]);
+
+            let table = document.createElement("table");
+            table.classList.add("table", "table-bordered");
+            table.style.borderRadius = "2px";
+
+            execution_row.children[0].appendChild(table);
+
+            let thead = document.createElement("thead");
+            let row1 = document.createElement("tr");
+
+            let thead_content = ["Stage Number", "Stage Name", "Status"];
+            for(let content of thead_content) {
+                let col = document.createElement("td");
+                col.innerHTML = "<strong>"+content+"</strong>";
+                row1.appendChild(col);
+            }
+            table.appendChild(thead);
+            thead.appendChild(row1);
+            thead.classList.add("table-primary");
+
+            execution_row.style.display = "table-row";
+            displayed_row = execution_row;
 
             let execution_request = {
                 pipeline_id: id,
@@ -102,6 +132,8 @@ execute_link.addEventListener('click', async (e) => {
                 validate: 0
             }
 
+            connect(table);
+            stageData = [];
             let response = await fetch('/executePipeline', {
                 method: 'POST',
                 headers: {
@@ -111,7 +143,11 @@ execute_link.addEventListener('click', async (e) => {
             })
 
             let result = await response.json();
+            disconnect();
+
             notification(result, pipeline_list[id][0]);
+            execute_button.disabled = false;
+            execute_button.innerText = "Execute";
         });
 
         col2.appendChild(execute_button);
@@ -120,7 +156,16 @@ execute_link.addEventListener('click', async (e) => {
         row.appendChild(col1);
         row.appendChild(col2);
 
+        let row2 = document.createElement("tr");
+        row2.setAttribute("id", pipeline_list[id][0]);
+        row2.style.display = "none";
+
+        let col = document.createElement("td");
+        col.setAttribute("colspan", "10");
+        row2.appendChild(col);
+
         pipeline_table.appendChild(row);
+        pipeline_table.appendChild(row2);
     }
 });
 
@@ -181,14 +226,26 @@ create_pipeline_form.addEventListener('submit', async (e) => {
 window.onload = () => {
     execute_link.click();
 }
-function connect() {
-    var socket = new SockJS('/gs-guide-websocket');
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
 
+function connect(table) {
+    let socket = new SockJS('/gs-guide-websocket');
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
         stompClient.subscribe('/result/stage', function (stageResultMessage) {
-            showStageResult(JSON.parse(stageResultMessage.body).content);
+            let stage_info = JSON.parse(stageResultMessage.body);
+            let row = document.createElement("tr");
+
+            for(let property in stage_info) {
+                let col = document.createElement("td");
+                col.innerText = stage_info[property];
+                row.appendChild(col);
+                if(stage_info["status"] === "success") row.classList.add("table-success");
+                else row.classList.add("table-danger");
+            }
+
+            table.appendChild(row);
         });
     });
 }
@@ -197,7 +254,4 @@ function disconnect() {
         stompClient.disconnect();
     }
     console.log("Disconnected");
-}
-function showStageResult(stageResultMessage) {
-    console.log(stageResultMessage);
 }
