@@ -1,12 +1,11 @@
 let stompClient = null;
 
-let create_pipeline_form = document.getElementById('createPipelineForm');
-
 let execute_link = document.querySelector('#execute-button');
 let create_link = document.querySelector('#create-button');
 let execute_panel = document.querySelector('#execute-panel');
 let create_panel = document.querySelector('#create-panel');
-let displayed_row;
+let add_xml = document.querySelector('#add-pipeline-xml');
+let displayed_row, pipeline_name;
 
 let stageData = []
 
@@ -65,6 +64,7 @@ execute_link.addEventListener('click', async (e) => {
 
         let col1 = document.createElement("td");
         col1.innerText = pipeline_list[id][0];
+        col1.style.verticalAlign = "middle";
 
         let col2 = document.createElement("td");
         let execute_button = document.createElement("button");
@@ -72,8 +72,6 @@ execute_link.addEventListener('click', async (e) => {
         execute_button.classList.add("btn-primary");
         execute_button.innerText = "Execute";
         execute_button.style.width = "100px";
-        execute_button.style.margin = "5px";
-        execute_button.style.padding = "5px";
 
         let show_button = document.createElement("button");
         show_button.classList.add("btn", "btn-warning", "bi", "bi-eye");
@@ -82,8 +80,6 @@ execute_link.addEventListener('click', async (e) => {
             "  <path d=\"M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z\"/>\n" +
             "</svg>";
 
-        show_button.style.margin = "5px";
-        show_button.style.padding = "5px";
         show_button.setAttribute("data-toggle", "modal");
         show_button.setAttribute("data-target", "#myModal");
 
@@ -106,7 +102,6 @@ execute_link.addEventListener('click', async (e) => {
 
             let table = document.createElement("table");
             table.classList.add("table", "table-bordered");
-            table.style.borderRadius = "2px";
 
             execution_row.children[0].appendChild(table);
 
@@ -172,18 +167,18 @@ execute_link.addEventListener('click', async (e) => {
 create_link.addEventListener('click', () => {
     execute_panel.style.display = "none";
     create_panel.style.display = "block";
-
     let d = new Date();
-
-    document.getElementById('pipeline-name').value = "pipeline_"+d.getTime()+".xml";
+    pipeline_name = "pipeline_" + d.getTime() + ".xml";
+    document.getElementById('pipeline-name').innerText = pipeline_name;
 });
 
-create_pipeline_form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+add_xml.addEventListener('click', async (e) => {
+
+    add_xml.innerText = "Adding";
+    add_xml.disabled = true;
 
     let pipeline_request = {
-        name: document.querySelector("#pipeline-name").value,
+        name: pipeline_name,
         pipeline: document.getElementById('pipeline-xml').value
     }
 
@@ -193,7 +188,7 @@ create_pipeline_form.addEventListener('submit', async (e) => {
         validate: 1
     }
 
-    let response = await fetch('/executePipeline', {
+    let message = await fetch('/executePipeline', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
@@ -201,26 +196,27 @@ create_pipeline_form.addEventListener('submit', async (e) => {
         body: JSON.stringify(validation_request)
     });
 
-    let data = await response.json();
-    console.log(data);
-
+    let data = await message.json();
     if(data.status === "error") {
+        document.querySelector('#close-add-pipeline').click();
+        add_xml.innerText = "Add Pipeline";
+        add_xml.disabled = false;
         notification(data, pipeline_request.name);
         return;
     }
 
-    if (create_pipeline_form.checkValidity() === true) {
-        document.getElementById('pipeline-xml').value = '';
-        let response = await fetch('/savePipeline', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify(pipeline_request)
-        });
-        let result = await response.json();
-        notification(result, pipeline_request.name);
-    }
+    let response = await fetch('/savePipeline', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(pipeline_request)
+    });
+
+    let result = await response.json();
+    execute_link.click();
+    document.querySelector('#close-add-pipeline').click();
+    notification(result, pipeline_request.name);
 });
 
 window.onload = () => {
