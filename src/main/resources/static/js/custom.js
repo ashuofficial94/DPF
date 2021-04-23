@@ -5,9 +5,14 @@ let create_link = document.querySelector('#create-button');
 let execute_panel = document.querySelector('#execute-panel');
 let create_panel = document.querySelector('#create-panel');
 let add_xml = document.querySelector('#add-pipeline-xml');
+let add_stage = document.querySelector('#add-stage');
+let delete_stage = document.querySelector('#delete-stage');
+let pipeline_form = document.querySelector('#pipeline-form');
+
 let displayed_row, pipeline_name;
 
 let stageData = []
+let curr_stage = 0;
 
 let notification = (result, pipeline_name) => {
     let notification_header = document.getElementById('notification-header');
@@ -172,6 +177,99 @@ create_link.addEventListener('click', () => {
     document.getElementById('pipeline-name').innerText = pipeline_name;
 });
 
+delete_stage.addEventListener('click', () => {
+    let stages = document.querySelector('#stages');
+    if(stages.childElementCount > 0) {
+        stages.removeChild(stages.children[stages.childElementCount-1]);
+        curr_stage--;
+    }
+})
+
+add_stage.addEventListener('click', () => {
+    let stages = document.querySelector('#stages');
+    curr_stage++;
+
+    let stage = document.createElement('div');
+    stage.classList.add("form-group");
+
+    let stage_number = document.createElement('div');
+    stage_number.classList.add('row');
+
+    let stage_number_label = document.createElement("label");
+    stage_number_label.setAttribute("for", "stage-number-"+curr_stage);
+    stage_number_label.innerHTML = "<strong>Stage Number: </strong>"
+    stage_number_label.classList.add("col-md-3")
+
+    let stage_number_input = document.createElement("input");
+    stage_number_input.setAttribute("type", "text");
+    stage_number_input.setAttribute("id", "stage-number-"+curr_stage);
+    stage_number_input.classList.add("form-control", "col-md-8");
+
+    stage_number_input.value = curr_stage+"";
+    stage_number_input.disabled = true;
+
+    stage_number.appendChild(stage_number_label);
+    stage_number.appendChild(stage_number_input);
+
+    let stage_name = document.createElement('div');
+    stage_name.classList.add('row');
+
+    let stage_name_label = document.createElement('label');
+    stage_name_label.setAttribute("for", "stage-name-"+curr_stage);
+    stage_name_label.innerHTML = "<strong>Stage Name: </strong>"
+    stage_name_label.classList.add("col-md-3")
+
+    let stage_name_input = document.createElement("input");
+    stage_name_input.setAttribute("type", "text");
+    stage_name_input.setAttribute("id", "stage-name-"+curr_stage);
+    stage_name_input.classList.add("form-control", "col-md-8");
+    stage_name_input.required = true;
+
+    stage_name.appendChild(stage_name_label);
+    stage_name.appendChild(stage_name_input);
+
+    let stage_description = document.createElement('div');
+    stage_description.classList.add('row');
+
+    let stage_description_label = document.createElement('label');
+    stage_description_label.setAttribute("for", "stage-description-"+curr_stage);
+    stage_description_label.innerHTML = "<strong>Stage Description: </strong>"
+    stage_description_label.classList.add("col-md-3");
+
+    let stage_description_input = document.createElement("input");
+    stage_description_input.setAttribute("type", "text");
+    stage_description_input.setAttribute("id", "stage-description-"+curr_stage);
+    stage_description_input.classList.add("form-control", "col-md-8");
+
+    stage_description.appendChild(stage_description_label);
+    stage_description.appendChild(stage_description_input);
+
+    let stage_executable = document.createElement('div');
+    stage_executable.classList.add('row');
+
+    let stage_executable_label = document.createElement('label');
+    stage_executable_label.setAttribute("for", "stage-executable-"+curr_stage);
+    stage_executable_label.innerHTML = "<strong>Executable: </strong>"
+    stage_executable_label.classList.add("col-md-3");
+
+    let stage_executable_input = document.createElement("input");
+    stage_executable_input.setAttribute("type", "text");
+    stage_executable_input.setAttribute("id", "stage-executable-"+curr_stage);
+    stage_executable_input.classList.add("form-control", "col-md-8");
+    stage_executable_input.required = true;
+
+    stage_executable.appendChild(stage_executable_label);
+    stage_executable.appendChild(stage_executable_input);
+
+    stage.appendChild(stage_number);
+    stage.appendChild(stage_name);
+    stage.appendChild(stage_description);
+    stage.appendChild(stage_executable);
+
+    stage.appendChild(document.createElement("hr"));
+    stages.appendChild(stage);
+})
+
 add_xml.addEventListener('click', async (e) => {
 
     add_xml.innerText = "Adding";
@@ -216,8 +314,107 @@ add_xml.addEventListener('click', async (e) => {
     let result = await response.json();
     execute_link.click();
     document.querySelector('#close-add-pipeline').click();
+    add_xml.innerText = "Add Pipeline";
+    add_xml.disabled = false;
     notification(result, pipeline_request.name);
 });
+
+pipeline_form.addEventListener('submit', async(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    let db_url = document.querySelector('#db-url').value;
+    let db_name = document.querySelector('#db-name').value;
+    let db_user = document.querySelector('#db-user').value;
+    let db_pass = document.querySelector('#db-pass').value;
+
+    // <DBURL>localhost:3306</DBURL>
+    // <DBName>employees</DBName>
+    // <DBUserName>root</DBUserName>
+    // <DBPassword>password</DBPassword>
+
+    let feed_component = "<Feed>" +
+        "<DBURL>" + db_url + "</DBURL>" +
+        "<DBName>" + db_name + "</DBName>" +
+        "<DBUserName>" + db_user + "</DBUserName>" +
+        "<DBPassword>" + db_pass + "</DBPassword>" +
+        "</Feed>"
+
+    let stage_numbers = [];
+    let stage_names = [];
+    let stage_descriptions = [];
+    let stage_executables = [];
+
+    for(let index=1; index<=curr_stage; index++) {
+        stage_numbers.push(index);
+        stage_names.push(document.querySelector('#stage-name-'+index).value);
+        stage_descriptions.push(document.querySelector('#stage-description-'+index).value);
+        stage_executables.push(document.querySelector('#stage-executable-'+index).value);
+    }
+
+    let stage_components = "";
+
+    for(let index in stage_numbers) {
+        stage_components += "<stage number='"+stage_numbers[index]+"'>" +
+            "<stageName>"+stage_names[index]+"</stageName>" +
+            "<stageDesciption>"+stage_descriptions[index]+"</stageDesciption>" +
+            "<sqlProcessing>"+stage_executables[index]+"</sqlProcessing>" +
+            "<output>File</output>" +
+            "</stage>"
+    }
+
+    let stages_component = "<Stages>"+stage_components+"</Stages>"
+
+    let xml_string = "<?xml version='1.0'?>" +
+        "<Pipelines xmlns ='uri:pipelineSchema' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='uri:pipelineSchema pipeline.xsd'>" +
+        "<Pipeline pipelineName='EmployeePipeline'>" + feed_component + stages_component +
+        "</Pipeline>" +
+        "</Pipelines>"
+
+    let parser = new DOMParser();
+    let xmlDoc = parser.parseFromString(xml_string,"text/xml");
+
+    let xml = new XMLSerializer().serializeToString(xmlDoc.documentElement);
+    console.log(xml);
+    console.log(xml_string);
+
+    let xml_request = {
+        name: pipeline_name,
+        pipeline: xml
+    }
+
+    let xml_validation_request = {
+        pipeline_id: 0,
+        pipeline: xml_request.pipeline,
+        validate: 1
+    }
+
+    let message = await fetch('/executePipeline', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(xml_validation_request)
+    });
+
+    let data = await message.json();
+    if(data.status === "error") {
+        notification(data, xml_request.name);
+        return;
+    }
+
+    let response = await fetch('/savePipeline', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(xml_request)
+    });
+
+    let result = await response.json();
+    execute_link.click();
+    notification(result, xml_request.name);
+})
 
 window.onload = () => {
     execute_link.click();

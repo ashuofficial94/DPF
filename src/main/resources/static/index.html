@@ -36,13 +36,38 @@
             <div class="panel">
                 <div id="execute-panel">
                     <h3>Pipelines Available</h3>
-                    <table class="table table-hover" id="pipeline-list">
-
-                    </table>
+                    <table class="table table-hover" id="pipeline-list"></table>
                 </div>
                 <div id="create-panel" style="display: none">
                     <label style="font-size: 24px">Create Pipeline</label>
                     <button class="btn btn-success" style="float: right" data-toggle="modal" data-target="#pipeline-modal">Add XML</button>
+                    <hr>
+                    <form id="pipeline-form" class="form-horizontal">
+                        <div id="feed" class="form-inline form-group">
+                            <div>
+                                <label for="db-url"><strong>DB URL</strong></label>
+                                <input type="text" class="form-control" id="db-url" required>
+                            </div>
+                            <div>
+                                <label for="db-name"><strong>DB Name</strong></label>
+                                <input type="text" class="form-control" id="db-name" required>
+                            </div>
+                            <div>
+                                <label for="db-user"><strong>Username</strong></label>
+                                <input type="text" class="form-control" id="db-user" required>
+                            </div>
+                            <div>
+                                <label for="db-pass"><strong>Password</strong></label>
+                                <input type="text" class="form-control" id="db-pass" required>
+                            </div>
+                        </div>
+                        <div id="stages"></div><br>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-outline-primary" id="add-stage">Add Stage</button>
+                            <button type="button" class="btn btn-outline-danger" id="delete-stage">Delete Stage</button>
+                        </div>
+                        <button type="submit" class="btn btn-success" id="add-pipeline">Add Pipeline</button>
+                    </form>
                 </div>
             </div>
             <div class="modal fade" id="myModal">
