@@ -85,7 +85,7 @@ execute_link.addEventListener('click', async (e) => {
             "  <path d=\"M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z\"/>\n" +
             "</svg>";
 
-        show_button.setAttribute("data-toggle", "modal");
+        show_button.setAttribute( "data-toggle", "modal");
         show_button.setAttribute("data-target", "#myModal");
 
         show_button.addEventListener('click', e => {
@@ -280,6 +280,8 @@ add_xml.addEventListener('click', async (e) => {
         pipeline: document.getElementById('pipeline-xml').value
     }
 
+    console.log(pipeline_request.pipeline);
+
     let validation_request = {
         pipeline_id: 0,
         pipeline: pipeline_request.pipeline,
@@ -333,12 +335,12 @@ pipeline_form.addEventListener('submit', async(e) => {
     // <DBUserName>root</DBUserName>
     // <DBPassword>password</DBPassword>
 
-    let feed_component = "<Feed>" +
-        "<DBURL>" + db_url + "</DBURL>" +
-        "<DBName>" + db_name + "</DBName>" +
-        "<DBUserName>" + db_user + "</DBUserName>" +
-        "<DBPassword>" + db_pass + "</DBPassword>" +
-        "</Feed>"
+    let feed_component = " <Feed>" +
+        " <DBURL>" + db_url + "</DBURL> " +
+        " <DBName>" + db_name + "</DBName> " +
+        " <DBUserName>" + db_user + "</DBUserName> " +
+        " <DBPassword>" + db_pass + "</DBPassword> " +
+        "</Feed> "
 
     let stage_numbers = [];
     let stage_names = [];
@@ -355,28 +357,29 @@ pipeline_form.addEventListener('submit', async(e) => {
     let stage_components = "";
 
     for(let index in stage_numbers) {
-        stage_components += "<stage number='"+stage_numbers[index]+"'>" +
-            "<stageName>"+stage_names[index]+"</stageName>" +
-            "<stageDesciption>"+stage_descriptions[index]+"</stageDesciption>" +
-            "<sqlProcessing>"+stage_executables[index]+"</sqlProcessing>" +
-            "<output>File</output>" +
-            "</stage>"
+        let stage_number = "'"+stage_numbers[index]+"'"
+        stage_components +=
+            " <stage number="+stage_number+">" +
+                " <stageName>"+stage_names[index]+"</stageName> " +
+                " <stageDesciption>"+stage_descriptions[index]+"</stageDesciption> " +
+                " <sqlProcessing>"+stage_executables[index]+"</sqlProcessing> " +
+                " <output>File</output> " +
+            "</stage> "
     }
 
-    let stages_component = "<Stages>"+stage_components+"</Stages>"
+    let xml_header = "<?xml version='1.0' encoding='UTF-8'?>";
+    let xml = xml_header +
+        " <Pipelines xmlns='uri:pipelineSchema' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "+
+        "xsi:schemaLocation='uri:pipelineSchema pipeline.xsd'>" +
+            " <Pipeline pipelineName='EmployeePipeline'>" +
+                feed_component +
+                " <Stages>"+stage_components+"</Stages> " +
+            "</Pipeline> " +
+        "</Pipelines> ";
 
-    let xml_string = "<?xml version='1.0'?>" +
-        "<Pipelines xmlns ='uri:pipelineSchema' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='uri:pipelineSchema pipeline.xsd'>" +
-        "<Pipeline pipelineName='EmployeePipeline'>" + feed_component + stages_component +
-        "</Pipeline>" +
-        "</Pipelines>"
 
-    let parser = new DOMParser();
-    let xmlDoc = parser.parseFromString(xml_string,"text/xml");
-
-    let xml = new XMLSerializer().serializeToString(xmlDoc.documentElement);
-    console.log(xml);
-    console.log(xml_string);
+    let p = new DOMParser();
+    let xmlDoc = p.parseFromString(xml, "text/xml");
 
     let xml_request = {
         name: pipeline_name,
