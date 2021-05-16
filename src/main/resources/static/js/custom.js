@@ -335,12 +335,12 @@ pipeline_form.addEventListener('submit', async(e) => {
     // <DBUserName>root</DBUserName>
     // <DBPassword>password</DBPassword>
 
-    let feed_component = " <Feed>" +
-        " <DBURL>" + db_url + "</DBURL> " +
-        " <DBName>" + db_name + "</DBName> " +
-        " <DBUserName>" + db_user + "</DBUserName> " +
-        " <DBPassword>" + db_pass + "</DBPassword> " +
-        "</Feed> "
+    let feed_component = "<Feed>" +
+        "<DBURL>" + db_url + "</DBURL>" +
+        "<DBName>" + db_name + "</DBName>" +
+        "<DBUserName>" + db_user + "</DBUserName>" +
+        "<DBPassword>" + db_pass + "</DBPassword>" +
+        "</Feed>"
 
     let stage_numbers = [];
     let stage_names = [];
@@ -359,27 +359,25 @@ pipeline_form.addEventListener('submit', async(e) => {
     for(let index in stage_numbers) {
         let stage_number = "'"+stage_numbers[index]+"'"
         stage_components +=
-            " <stage number="+stage_number+">" +
-                " <stageName>"+stage_names[index]+"</stageName> " +
-                " <stageDesciption>"+stage_descriptions[index]+"</stageDesciption> " +
-                " <sqlProcessing>"+stage_executables[index]+"</sqlProcessing> " +
-                " <output>File</output> " +
-            "</stage> "
+            "<stage number="+stage_number+">" +
+                "<stageName>"+stage_names[index]+"</stageName>" +
+                "<stageDesciption>"+stage_descriptions[index]+"</stageDesciption>" +
+                "<sqlProcessing>"+stage_executables[index]+"</sqlProcessing>" +
+                "<output>File</output>" +
+            "</stage>"
     }
 
     let xml_header = "<?xml version='1.0' encoding='UTF-8'?>";
     let xml = xml_header +
-        " <Pipelines xmlns='uri:pipelineSchema' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "+
+        "<Pipelines xmlns='uri:pipelineSchema' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "+
         "xsi:schemaLocation='uri:pipelineSchema pipeline.xsd'>" +
-            " <Pipeline pipelineName='EmployeePipeline'>" +
+            "<Pipeline pipelineName='EmployeePipeline'>" +
                 feed_component +
-                " <Stages>"+stage_components+"</Stages> " +
-            "</Pipeline> " +
-        "</Pipelines> ";
+                "<Stages>"+stage_components+"</Stages>" +
+            "</Pipeline>" +
+        "</Pipelines>";
 
-
-    let p = new DOMParser();
-    let xmlDoc = p.parseFromString(xml, "text/xml");
+    xml = xml.replaceAll("><", ">\n<");
 
     let xml_request = {
         name: pipeline_name,
